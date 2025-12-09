@@ -12,7 +12,7 @@
 
 # testing
 /coverage
-
+.gitignore
 # next.js
 /.next/
 /out/
