@@ -1,0 +1,374 @@
+import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaPg } from '@prisma/adapter-pg'
+import 'dotenv/config'
+
+const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+})
+
+const prisma = new PrismaClient({
+    adapter,
+});
+
+
+
+
+
+
+// 定义数据结构
+interface ChapterData {
+    code: string;
+    name: string;
+}
+
+interface SectionData {
+    code: string; // 罗马数字 I, II...
+    name: string;
+    chapters: ChapterData[];
+}
+
+// --- 完整海关编码数据 (2024/2025 标准) ---
+const HS_DATA: SectionData[] = [
+    {
+        code: 'I',
+        name: '活动物; 动物产品',
+        chapters: [
+            { code: '01', name: '活动物' },
+            { code: '02', name: '肉及食用杂碎' },
+            { code: '03', name: '鱼、甲壳动物、软体动物及其他水生无脊椎动物' },
+            { code: '04', name: '乳品; 蛋品; 天然蜂蜜; 其他食用动物产品' },
+            { code: '05', name: '其他动物产品' },
+        ],
+    },
+    {
+        code: 'II',
+        name: '植物产品',
+        chapters: [
+            { code: '06', name: '活树及其他植物; 鳞茎、根及类似品; 插花及装饰用叶' },
+            { code: '07', name: '食用蔬菜、根及块茎' },
+            { code: '08', name: '食用水果及坚果; 柑橘属水果或甜瓜的果皮' },
+            { code: '09', name: '咖啡、茶、马黛茶及调味香料' },
+            { code: '10', name: '谷物' },
+            { code: '11', name: '制粉工业产品; 麦芽; 淀粉; 菊粉; 面筋' },
+            { code: '12', name: '含油子仁及果实; 杂项子仁及果实; 工业用或药用植物; 稻草、秸秆及饲料' },
+            { code: '13', name: '胶虫漆; 树胶、树脂及其他植物液、汁' },
+            { code: '14', name: '编结用植物材料; 其他植物产品' },
+        ],
+    },
+    {
+        code: 'III',
+        name: '动植物油脂及其分解产品; 精制的食用油脂; 动植物蜡',
+        chapters: [
+            { code: '15', name: '动植物油脂及其分解产品; 精制的食用油脂; 动植物蜡' },
+        ],
+    },
+    {
+        code: 'IV',
+        name: '食品; 饮料、酒及醋; 烟草、烟草及代用品的制品',
+        chapters: [
+            { code: '16', name: '肉、鱼、甲壳动物、软体动物及其他水生无脊椎动物的制品' },
+            { code: '17', name: '糖及糖食' },
+            { code: '18', name: '可可及可可制品' },
+            { code: '19', name: '谷物、粮食粉、淀粉或乳的制品; 糕饼点心' },
+            { code: '20', name: '蔬菜、水果、坚果或植物其他部分的制品' },
+            { code: '21', name: '杂项食品' },
+            { code: '22', name: '饮料、酒及醋' },
+            { code: '23', name: '食品工业的残渣及废料; 配制的动物饲料' },
+            { code: '24', name: '烟草、烟草及代用品的制品' },
+        ],
+    },
+    {
+        code: 'V',
+        name: '矿产品',
+        chapters: [
+            { code: '25', name: '盐; 硫磺; 土及石料; 石膏、石灰及水泥' },
+            { code: '26', name: '矿砂、矿渣及矿灰' },
+            { code: '27', name: '矿物燃料、矿物油及其蒸馏产品; 沥青物质; 矿物蜡' },
+        ],
+    },
+    {
+        code: 'VI',
+        name: '化学工业及其相关工业的产品',
+        chapters: [
+            { code: '28', name: '无机化学品; 贵金属、稀土金属、放射性元素及其同位素的有机及无机化合物' },
+            { code: '29', name: '有机化学品' },
+            { code: '30', name: '药品' },
+            { code: '31', name: '肥料' },
+            { code: '32', name: '鞣料浸膏及染料浸膏; 鞣酸及其衍生物; 染料、颜料及其他着色料; 油漆及清漆; 油灰及其他类玛士腻; 墨水、油墨' },
+            { code: '33', name: '精油及香膏; 香料制品及化妆盥洗品' },
+            { code: '34', name: '肥皂、有机表面活性剂、洗涤剂、润滑剂、人造蜡、调制蜡、光洁剂、防蜡烛及类似品、塑型用膏、“牙科用蜡”及牙科用熟石膏制剂' },
+            { code: '35', name: '蛋白类物质; 改性淀粉; 胶; 酶' },
+            { code: '36', name: '炸药; 烟火制品; 火柴; 引火合金; 易燃材料制品' },
+            { code: '37', name: '照相及电影用品' },
+            { code: '38', name: '杂项化学产品' },
+        ],
+    },
+    {
+        code: 'VII',
+        name: '塑料及其制品; 橡胶及其制品',
+        chapters: [
+            { code: '39', name: '塑料及其制品' },
+            { code: '40', name: '橡胶及其制品' },
+        ],
+    },
+    {
+        code: 'VIII',
+        name: '生皮、皮革、毛皮及其制品; 鞍具及挽具; 旅行用品、手提包及类似容器; 动物肠线(蚕胶丝除外)制品',
+        chapters: [
+            { code: '41', name: '生皮(毛皮除外)及皮革' },
+            { code: '42', name: '皮革制品; 鞍具及挽具; 旅行用品、手提包及类似容器; 动物肠线(蚕胶丝除外)制品' },
+            { code: '43', name: '毛皮、人造毛皮及其制品' },
+        ],
+    },
+    {
+        code: 'IX',
+        name: '木及木制品; 木炭; 软木及软木制品; 稻草、以斯帕托草或其他编结材料制品; 篮筐及柳条编结品',
+        chapters: [
+            { code: '44', name: '木及木制品; 木炭' },
+            { code: '45', name: '软木及软木制品' },
+            { code: '46', name: '稻草、以斯帕托草或其他编结材料制品; 篮筐及柳条编结品' },
+        ],
+    },
+    {
+        code: 'X',
+        name: '木浆及其他纤维状纤维素浆; 回收(废碎)纸或纸板; 纸、纸板及其制品',
+        chapters: [
+            { code: '47', name: '木浆及其他纤维状纤维素浆; 回收(废碎)纸或纸板' },
+            { code: '48', name: '纸及纸板; 纸浆、纸或纸板制品' },
+            { code: '49', name: '书籍、报纸、印刷图画及其他印刷品; 手稿、打字稿及设计图纸' },
+        ],
+    },
+    {
+        code: 'XI',
+        name: '纺织原料及纺织制品',
+        chapters: [
+            { code: '50', name: '蚕丝' },
+            { code: '51', name: '羊毛、动物细毛或粗毛; 马毛纱线及其机织物' },
+            { code: '52', name: '棉花' },
+            { code: '53', name: '其他植物纺织纤维; 纸纱线及其机织物' },
+            { code: '54', name: '化学纤维长丝; 扁条及类似品' },
+            { code: '55', name: '化学纤维短纤' },
+            { code: '56', name: '絮胎、毡呢及无纺织物; 特种纱线; 线、绳、索、缆及其制品' },
+            { code: '57', name: '地毯及纺织材料的其他铺地制品' },
+            { code: '58', name: '特种机织物; 簇绒织物; 花边; 挂毯; 装饰制品; 刺绣品' },
+            { code: '59', name: '浸渍、涂布、包覆或层压纺织物; 工业用纺织制品' },
+            { code: '60', name: '针织物及钩编织物' },
+            { code: '61', name: '针织或钩编的服装及衣着附件' },
+            { code: '62', name: '非针织或非钩编的服装及衣着附件' },
+            { code: '63', name: '其他纺织制成品; 成套物品; 旧衣着及旧纺织品; 碎织物' },
+        ],
+    },
+    {
+        code: 'XII',
+        name: '鞋、帽、伞、杖、鞭及其零件; 已加工的羽毛及其制品; 人造花; 人发制品',
+        chapters: [
+            { code: '64', name: '鞋靴、护腿和类似品及其零件' },
+            { code: '65', name: '帽类及其零件' },
+            { code: '66', name: '雨伞、阳伞、手杖、鞭子、马鞭及其零件' },
+            { code: '67', name: '已加工羽毛、羽绒及其制品; 人造花; 人发制品' },
+        ],
+    },
+    {
+        code: 'XIII',
+        name: '石料、石膏、水泥、石棉、云母及类似材料的制品; 陶瓷产品; 玻璃及其制品',
+        chapters: [
+            { code: '68', name: '石料、石膏、水泥、石棉、云母及类似材料的制品' },
+            { code: '69', name: '陶瓷产品' },
+            { code: '70', name: '玻璃及其制品' },
+        ],
+    },
+    {
+        code: 'XIV',
+        name: '天然或养殖珍珠、宝石或半宝石、贵金属、包贵金属及其制品; 仿首饰; 硬币',
+        chapters: [
+            { code: '71', name: '天然或养殖珍珠、宝石或半宝石、贵金属、包贵金属及其制品; 仿首饰; 硬币' },
+        ],
+    },
+    {
+        code: 'XV',
+        name: '贱金属及其制品',
+        chapters: [
+            { code: '72', name: '钢铁' },
+            { code: '73', name: '钢铁制品' },
+            { code: '74', name: '铜及其制品' },
+            { code: '75', name: '镍及其制品' },
+            { code: '76', name: '铝及其制品' },
+            { code: '77', name: '（保留为将来使用）' },
+            { code: '78', name: '铅及其制品' },
+            { code: '79', name: '锌及其制品' },
+            { code: '80', name: '锡及其制品' },
+            { code: '81', name: '其他贱金属、金属陶瓷及其制品' },
+            { code: '82', name: '贱金属工具、器具、利口器、餐匙、餐叉及其零件' },
+            { code: '83', name: '贱金属杂项制品' },
+        ],
+    },
+    {
+        code: 'XVI',
+        name: '机器、机械器具、电气设备及其零件; 录音机及放声机、电视图像、声音的录制和重放设备及其零件、附件',
+        chapters: [
+            { code: '84', name: '核反应堆、锅炉、机器、机械器具及其零件' },
+            { code: '85', name: '电机、电气设备及其零件; 录音机及放声机、电视图像、声音的录制和重放设备及其零件、附件' },
+        ],
+    },
+    {
+        code: 'XVII',
+        name: '车辆、航空器、船舶及有关运输设备',
+        chapters: [
+            { code: '86', name: '铁道及电车道机车、车辆及其零件; 铁道及电车道轨道固定装置及其零件、附件; 各种机械(包括电动机械)交通信号设备' },
+            { code: '87', name: '车辆及其零件、附件，但铁道及电车道车辆除外' },
+            { code: '88', name: '航空器、航天器及其零件' },
+            { code: '89', name: '船舶及浮动结构体' },
+        ],
+    },
+    {
+        code: 'XVIII',
+        name: '光学、照相、电影、计量、检验、医疗或外科用仪器及设备、精密仪器及设备; 钟表; 乐器; 上述物品的零件、附件',
+        chapters: [
+            { code: '90', name: '光学、照相、电影、计量、检验、医疗或外科用仪器及设备、精密仪器及设备; 上述物品的零件、附件' },
+            { code: '91', name: '钟表及其零件' },
+            { code: '92', name: '乐器及其零件、附件' },
+        ],
+    },
+    {
+        code: 'XIX',
+        name: '武器、弹药及其零件、附件',
+        chapters: [
+            { code: '93', name: '武器、弹药及其零件、附件' },
+        ],
+    },
+    {
+        code: 'XX',
+        name: '杂项制品',
+        chapters: [
+            { code: '94', name: '家具; 寝具、褥垫、弹簧床垫、软坐垫及类似填充制品; 未列名灯具及照明装置; 发光标志、发光铭牌及类似品; 活动房屋' },
+            { code: '95', name: '玩具、游戏品、运动用品及其零件、附件' },
+            { code: '96', name: '杂项制品' },
+        ],
+    },
+    {
+        code: 'XXI',
+        name: '艺术品、收藏品及古物',
+        chapters: [
+            { code: '97', name: '艺术品、收藏品及古物' },
+            { code: '98', name: '特殊交易品及未分类商品' }, // 注意：这是某些国家特有的，标准HS通常只到97
+        ],
+    },
+];
+
+
+// --- 新增：生成 HsCode 模拟数据 ---
+async function seedMockHsCodes() {
+    console.log('🧪 开始生成 50 条 HsCode 模拟数据...');
+
+    // 1. 获取所有章节 ID，以便随机分配
+    const chapters = await prisma.chapter.findMany({
+        select: { id: true, code: true, name: true }
+    });
+
+    if (chapters.length === 0) {
+        console.error('⚠️ 未找到章节数据，无法生成 HsCode，请先运行章节初始化。');
+        return;
+    }
+
+    const mockHsCodes = [];
+
+    // 2. 循环生成 50 条数据
+    for (let i = 1; i <= 50; i++) {
+        // 随机选一个章节 (例如: 85章)
+        const randomChapter = chapters[Math.floor(Math.random() * chapters.length)];
+
+        // 生成唯一的后缀，确保 code 不重复
+        // 格式示例: 8501.00.01
+        const suffix = i.toString().padStart(4, '0');
+        const fullCode = `${randomChapter.code}01.${suffix.slice(0, 2)}.${suffix.slice(2)}`;
+        const cleanCode = `${randomChapter.code}01${suffix}`;
+
+        mockHsCodes.push({
+            code: fullCode,             // 格式化编码
+            cleanCode: cleanCode,       // 纯数字编码
+            name: `[测试] ${randomChapter.name} - 模拟商品 ${i}`,
+            nameEn: `[Test] Simulated Item ${i} for Chapter ${randomChapter.code}`,
+            description: `这是一条自动生成的测试数据，用于验证 Supabase 系统的连通性。序号: ${i}`,
+            unit: '千克',
+            mfnRate: Math.floor(Math.random() * 20) + '%', // 0-20% 随机税率
+            generalRate: '150%',
+            vatRate: '13%',
+            exportRate: '0%',
+            // 构造 JSON 数据测试
+            agreements: ["RCEP", "ASEAN"],
+            elements: {
+                "0": "品牌类型",
+                "1": "出口享惠情况",
+                "2": "型号",
+                "3": "测试字段"
+            },
+            supervision: {
+                "A": "入境货物通关单"
+            },
+            inspection: {
+                "M": "进口商品检验"
+            },
+            chapterId: randomChapter.id,
+            // 注意：createdAt 和 updatedAt 会由 Prisma 自动处理，无需手动填
+        });
+    }
+
+    // 3. 批量插入数据库
+    // 使用 createMany 提高性能，skipDuplicates 防止重复报错
+    const result = await prisma.hsCode.createMany({
+        data: mockHsCodes,
+        skipDuplicates: true,
+    });
+
+    console.log(`✅ 成功插入 ${result.count} 条 HsCode 测试数据！`);
+}
+
+async function main() {
+    console.log('🌱 开始初始化海关编码基础数据 (Sections & Chapters)...');
+
+    for (const section of HS_DATA) {
+        // 1. 插入或更新 大类 (Section)
+        const savedSection = await prisma.section.upsert({
+            where: { code: section.code },
+            update: { name: section.name }, // 如果存在，更新名字以防有变
+            create: {
+                code: section.code,
+                name: section.name,
+            },
+        });
+
+        console.log(`✅ 处理大类: [${section.code}] ${section.name}`);
+
+        // 2. 插入或更新 章节 (Chapters)
+        // 必须使用 savedSection.id 建立关联
+        for (const chapter of section.chapters) {
+            await prisma.chapter.upsert({
+                where: { code: chapter.code },
+                update: {
+                    name: chapter.name,
+                    sectionId: savedSection.id, // 确保关联关系正确
+                },
+                create: {
+                    code: chapter.code,
+                    name: chapter.name,
+                    sectionId: savedSection.id,
+                },
+            });
+        }
+    }
+
+    console.log('🎉 数据库初始化完成！共导入 21 个大类及其对应章节。');
+
+
+    await seedMockHsCodes();
+}
+
+main()
+    .then(async () => {
+        await prisma.$disconnect();
+    })
+    .catch(async (e) => {
+        console.error('❌ 初始化失败:', e);
+        await prisma.$disconnect();
+        process.exit(1);
+    });

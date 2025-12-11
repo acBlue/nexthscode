@@ -1,3 +1,5 @@
+"use client"; // <--- 必须加上这一行，且必须在第一行
+
 import React, { useState } from 'react';
 import { Copy, CheckCircle2, Printer, Calculator, ChevronRight } from 'lucide-react';
 import Link from 'next/link';

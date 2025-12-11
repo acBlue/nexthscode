@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { FileText } from 'lucide-react';
 
@@ -8,7 +10,13 @@ interface ElementItem {
     example: string;
 }
 
-export default function DeclarationElements({ items }: { items: ElementItem[] }) {
+// 给 items 一个默认值 []，防止父组件传 undefined
+export default function DeclarationElements({ items = [] }: { items: any }) {
+
+    // 🔥 核心修复：强制检查 items 是否为数组
+    // 如果 items 不是数组 (比如是 null, 或者数据库存的是个对象)，就强制转为空数组
+    const safeItems: ElementItem[] = Array.isArray(items) ? items : [];
+
     return (
         <section className="bg-white rounded-lg border border-gray-200 shadow-sm h-full flex flex-col">
             <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
@@ -32,24 +40,33 @@ export default function DeclarationElements({ items }: { items: ElementItem[] })
                     </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                    {items.map((el) => (
-                        <tr key={el.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-2.5 text-center text-gray-400 text-xs">{el.id}</td>
-                            <td className="px-2 py-2.5">
-                                {el.required ? (
-                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-600 border border-red-100">
-                       必填
-                     </span>
-                                ) : (
-                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-200">
-                       选填
-                     </span>
-                                )}
+                    {/* 如果没有数据，显示空状态 */}
+                    {safeItems.length === 0 ? (
+                        <tr>
+                            <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
+                                暂无申报要素信息
                             </td>
-                            <td className="px-2 py-2.5 font-medium text-gray-800">{el.name}</td>
-                            <td className="px-2 py-2.5 text-gray-500 text-xs truncate max-w-[120px]">{el.example}</td>
                         </tr>
-                    ))}
+                    ) : (
+                        safeItems.map((el) => (
+                            <tr key={el.id} className="hover:bg-gray-50">
+                                <td className="px-4 py-2.5 text-center text-gray-400 text-xs">{el.id}</td>
+                                <td className="px-2 py-2.5">
+                                    {el.required ? (
+                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-600 border border-red-100">
+                            必填
+                            </span>
+                                    ) : (
+                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-200">
+                            选填
+                            </span>
+                                    )}
+                                </td>
+                                <td className="px-2 py-2.5 font-medium text-gray-800">{el.name}</td>
+                                <td className="px-2 py-2.5 text-gray-500 text-xs truncate max-w-[120px]">{el.example}</td>
+                            </tr>
+                        ))
+                    )}
                     </tbody>
                 </table>
             </div>

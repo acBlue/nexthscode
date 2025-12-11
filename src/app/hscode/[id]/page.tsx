@@ -1,114 +1,103 @@
-"use client";
-
 import React from 'react';
+import { notFound } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-// 引入拆分后的组件
 import DetailHeader from '@/components/hscode/DetailHeader';
 import ChapterInfo from '@/components/hscode/ChapterInfo';
 import RegulatoryCard from '@/components/hscode/RegulatoryCard';
 import BasicRates from '@/components/hscode/BasicRates';
 import AgreementRates from '@/components/hscode/AgreementRates';
 import DeclarationElements from '@/components/hscode/DeclarationElements';
+// 1. 引入 Service
+import { getHsCodeDetail } from '@/services/hscode.service';
 
-// --- 模拟数据 (Database Mock) ---
-const DATA = {
-    hscode: "8542.31.00.00",
-    name: "用作处理器及控制器的集成电路",
-    nameEn: "Processors and controllers, whether or not combined with memories...",
+interface DetailPageProps {
+    params: Promise<{ id: string }>; // Next.js 15: params 也是 Promise
+}
 
-    // 章节信息
-    category: {
-        section: { code: "第十六类", name: "机器、机械器具、电气设备及其零件..." },
-        chapter: { code: "第八十五章", name: "电机、电气设备及其零件..." },
-    },
+export default async function DetailPage({ params }: DetailPageProps) {
+    // 2. 获取 URL 参数 (即 cleanCode, 如 8542310000)
+    const { id } = await params;
 
-    // 基础税率
-    basicRates: {
-        mfn: "0%",
-        general: "0%",
-        vat: "13%",
-        drawback: "13%"
-    },
+    // 3. 从数据库获取详情 (自动走缓存)
+    const data = await getHsCodeDetail(id);
 
-    // 协定税率
-    agreements: [
-        { name: "RCEP (中国-东盟)", rate: "0%", country: "东盟各国" },
-        { name: "RCEP (中国-日本)", rate: "0%", country: "日本" },
-        { name: "中韩自贸协定", rate: "0%", country: "韩国" },
-        { name: "中澳自贸协定", rate: "0%", country: "澳大利亚" },
-    ],
+    // 4. 如果没找到，返回 404 页面
+    if (!data) {
+        return notFound();
+    }
 
-    // 监管条件
-    supervision: [
-        { code: "6", name: "旧机电产品禁止进口" },
-        { code: "A", name: "入境货物通关单" },
-        { code: "B", name: "出境货物通关单" }
-    ],
+    // 5. 数据转换: 将数据库的 JSON 字段转换为组件需要的强类型
+    // 注意：这里需要使用 'as any' 或定义更严格的 Prisma Json 类型，为简洁演示使用断言
+    const formattedData = {
+        hscode: data.code,
+        name: data.name,
+        nameEn: data.nameEn || '',
 
-    // CIQ 检验检疫
-    inspection: [
-        { code: "M", name: "进口商品检验" },
-        { code: "L", name: "民用商品入境验证" }
-    ],
+        // 章节信息
+        category: {
+            section: {
+                code: data.chapter.section.code,
+                name: data.chapter.section.name
+            },
+            chapter: {
+                code: data.chapter.code,
+                name: data.chapter.name
+            },
+        },
 
-    // 申报要素
-    elements: [
-        { id: 1, name: "品名", required: true, example: "集成电路" },
-        { id: 2, name: "品牌类型", required: true, example: "无品牌" },
-        { id: 3, name: "出口享惠情况", required: true, example: "不享惠" },
-        { id: 4, name: "制作工艺", required: false, example: "单片/混合/多芯片等" },
-        { id: 5, name: "结构", required: true, example: "处理器及控制器" },
-        { id: 6, name: "品牌", required: true, example: "INTEL等" },
-        { id: 7, name: "型号", required: true, example: "i7-12700K" },
-    ]
-};
+        // 基础税率
+        basicRates: {
+            mfn: data.mfnRate || '-',
+            general: data.generalRate || '-',
+            vat: data.vatRate || '-',
+            drawback: data.exportRate || '-'
+        },
 
-export default function DetailPage() {
+        // 复杂 JSON 字段转换 (需要确保数据库里的 JSON 结构和组件 Props 匹配)
+        agreements: (data.agreements as any) || [],
+        supervision: (data.supervision as any) || [],
+        inspection: (data.inspection as any) || [],
+        elements: (data.elements as any) || []
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
             <Navbar />
 
-            {/* 1. 顶部 Header 组件 */}
             <DetailHeader
-                hscode={DATA.hscode}
-                name={DATA.name}
-                nameEn={DATA.nameEn}
+                hscode={formattedData.hscode}
+                name={formattedData.name}
+                nameEn={formattedData.nameEn}
             />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                    {/* --- 左侧边栏 (3列) --- */}
+                    {/* 左侧边栏 */}
                     <div className="lg:col-span-3 space-y-6">
-                        <ChapterInfo data={DATA.category} />
+                        <ChapterInfo data={formattedData.category} />
 
-                        {/* 复用 RegulatoryCard，分别展示监管条件和 CIQ */}
                         <RegulatoryCard
                             title="监管证件"
                             type="customs"
-                            items={DATA.supervision}
+                            items={formattedData.supervision}
                         />
 
                         <RegulatoryCard
                             title="CIQ 检验检疫"
                             type="ciq"
-                            items={DATA.inspection}
+                            items={formattedData.inspection}
                         />
                     </div>
 
-                    {/* --- 右侧主内容 (9列) --- */}
+                    {/* 右侧主内容 */}
                     <div className="lg:col-span-9 space-y-6">
-
-                        {/* 基础税率组件 */}
-                        <BasicRates data={DATA.basicRates} />
+                        <BasicRates data={formattedData.basicRates} />
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                            {/* 协定税率组件 */}
-                            <AgreementRates items={DATA.agreements} />
-
-                            {/* 申报要素组件 */}
-                            <DeclarationElements items={DATA.elements} />
+                            <AgreementRates items={formattedData.agreements} />
+                            <DeclarationElements items={formattedData.elements} />
                         </div>
 
                     </div>
