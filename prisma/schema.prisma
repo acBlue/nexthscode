@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Section {
+  id       String    @id @default(uuid())
+  code     String    @unique
+  name     String
+  chapters Chapter[]
+}
+
+model Chapter {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  desc      String?
+  sectionId String
+  section   Section  @relation(fields: [sectionId], references: [id])
+  hscodes   HsCode[]
+}
+
+model HsCode {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  cleanCode   String   @unique
+  name        String
+  nameEn      String?
+  description String?
+  unit        String?
+  mfnRate     String?
+  generalRate String?
+  vatRate     String?
+  exportRate  String?
+  agreements  Json?
+  elements    Json?
+  supervision Json?
+  inspection  Json?
+  chapterId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  chapter     Chapter  @relation(fields: [chapterId], references: [id])
+
+  @@index([cleanCode])
+  @@index([name])
+}
