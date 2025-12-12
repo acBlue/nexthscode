@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SearchLayout from '@/components/search/SearchLayout';
-import { searchHsCodes } from '@/services/hscode.service';
+import { searchHsCodes } from '@/services/hscode.service.ts';
 
 interface SearchPageProps {
     searchParams: Promise<{

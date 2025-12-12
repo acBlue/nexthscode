@@ -9,7 +9,7 @@ import BasicRates from '@/components/hscode/BasicRates';
 import AgreementRates from '@/components/hscode/AgreementRates';
 import DeclarationElements from '@/components/hscode/DeclarationElements';
 // 1. 引入 Service
-import { getHsCodeDetail } from '@/services/hscode.service';
+import { getHsCodeDetail } from '@/services/hscode.service.ts';
 
 interface DetailPageProps {
     params: Promise<{ id: string }>; // Next.js 15: params 也是 Promise
