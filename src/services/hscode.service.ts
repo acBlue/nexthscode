@@ -23,7 +23,6 @@ export async function searchHsCodes({ q, page = 1, pageSize = 10, chapters: sele
             ilike(hscodes.code, `%${cleanQuery}%`),       // 搜编码
             ilike(hscodes.cleanCode, `%${cleanQuery}%`),  // 搜纯数字
             ilike(hscodes.name, `%${cleanQuery}%`),       // 搜中文名
-            ilike(hscodes.nameEn, `%${cleanQuery}%`)      // 搜英文名
         ));
     }
 

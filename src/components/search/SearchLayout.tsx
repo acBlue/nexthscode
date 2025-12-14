@@ -124,9 +124,12 @@ export default function SearchLayout({
                                                     unit1: item.unit1, 
                                                     unit2: item.unit2,
                                                     regulatoryCode: item.regulatoryCode,
+                                                    // ✅ 新增：传递检疫代码
+                                                    quarantineCode: item.quarantineCode,
                                                     mfnRate: item.mfnRate,
                                                     vatRate: item.vatRate,
-                                                    exportRebateRate: item.exportRebateRate
+                                                    exportRebateRate: item.exportRebateRate,
+                                                    generalRate: item.generalRate
                                                 }} 
                                                 />
                             ))
