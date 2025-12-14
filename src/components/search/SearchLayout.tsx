@@ -111,24 +111,24 @@ export default function SearchLayout({
                             </div>
                         ) : (
                             results.map((item) => (
-                                <ResultCard
-                                    key={item.id}
-                                    item={{
-                                        id: item.id,
-                                        hscode: item.code,
-                                        name: item.name,
-                                        nameEn: item.nameEn || '',
-                                        unit: item.unit || '-',
-                                        rates: {
-                                            mfn: item.mfnRate || '-',
-                                            gen: item.generalRate || '-',
-                                            vat: item.vatRate || '-',
-                                            drawback: item.exportRate || '-'
-                                        },
-                                        regulatory: [],
-                                        isFavorite: false
-                                    }}
-                                />
+                                <ResultCard 
+                                                key={item.id} 
+                                                // 3. 关键修复：不要再手写嵌套对象了，直接映射扁平字段
+                                                item={{
+                                                    id: item.id,
+                                                    cleanCode: item.cleanCode, // 必须传，否则跳转失效
+                                                    code: item.code,
+                                                    name: item.name,
+                                                    
+                                                    // 直接取数据库的新字段
+                                                    unit1: item.unit1, 
+                                                    unit2: item.unit2,
+                                                    regulatoryCode: item.regulatoryCode,
+                                                    mfnRate: item.mfnRate,
+                                                    vatRate: item.vatRate,
+                                                    exportRebateRate: item.exportRebateRate
+                                                }} 
+                                                />
                             ))
                         )}
 

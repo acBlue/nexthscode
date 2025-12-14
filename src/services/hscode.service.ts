@@ -27,16 +27,6 @@ export async function searchHsCodes({ q, page = 1, pageSize = 10, chapters: sele
         ));
     }
 
-    // B. 章节筛选 (如果有)
-    // Drizzle 的关联筛选比较特别。 hscodes 表里只有 chapterId，但前端传的是 chapterCode (如 '85')。
-    // 严谨的做法是先查出 IDs，或者用子查询。
-    // 但为了性能，最好的设计是：hscodes 表里冗余存储一个 chapterCode 字段，或者我们在内存里处理。
-    // 这里我们使用子查询 (Subquery) 的思路，或者假设我们已经获取了 chapterId。
-
-    // 👉 方案优化：为了让逻辑跑通，我们这里先用一个简单的假设：
-    // 如果你需要精确筛选章节，我们可以在 hscodes 表里 join chapters 表进行筛选。
-    // 但 db.query API 做 filter relation 比较麻烦。
-    // 最简单的方案：先根据 selectedChapters (codes) 查出对应的 UUIDs
     if (selectedChapters && selectedChapters.length > 0) {
         // 1. 先查出 '85', '90' 对应的数据库 UUID
         const chapterRecords = await db.query.chapters.findMany({
@@ -59,13 +49,14 @@ export async function searchHsCodes({ q, page = 1, pageSize = 10, chapters: sele
 
     // 2. 执行查询 (Results)
     const results = await db.query.hscodes.findMany({
-        where: and(...conditions), // 使用 and 把所有条件连起来
+        where: and(...conditions),
         with: {
-            chapter: true, // 关联章节信息
+        chapter: true,
         },
-        orderBy: [asc(hscodes.code)], // 按编码排序
+        orderBy: [asc(hscodes.code)],
         limit: pageSize,
         offset: offset,
+        // Drizzle 默认会返回所有字段，这很好
     });
 
     // 3. 执行统计 (Total Count)
@@ -86,19 +77,19 @@ export async function searchHsCodes({ q, page = 1, pageSize = 10, chapters: sele
 
 // 详情页 Service (保持不变，确认一下语法即可)
 export const getHsCodeDetail = unstable_cache(
-    async (cleanCode: string) => {
-        const data = await db.query.hscodes.findFirst({
-            where: eq(hscodes.cleanCode, cleanCode),
-            with: {
-                chapter: {
-                    with: {
-                        section: true,
-                    },
-                },
-            },
-        });
-        return data;
-    },
-    ['hscode-detail-drizzle'],
-    { revalidate: 604800 }
+  async (cleanCode: string) => {
+    const data = await db.query.hscodes.findFirst({
+      where: eq(hscodes.cleanCode, cleanCode),
+      with: {
+        chapter: {
+          with: {
+            section: true,
+          },
+        },
+      },
+    });
+    return data;
+  },
+  ['hscode-detail-v2'], // 修改缓存 Key，强制刷新缓存
+  { revalidate: 604800 }
 );
