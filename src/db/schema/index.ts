@@ -2,5 +2,5 @@
 
 export * from './system';
 export * from './hscode';
-
+export * from './account';
 
