@@ -11,12 +11,12 @@ export default function Navbar() {
                         <div className="bg-blue-600 p-1.5 rounded-lg">
                             <Globe className="w-6 h-6 text-white" />
                         </div>
-                        <span className="text-xl font-bold text-gray-900">HSCode Master</span>
+                        <a href="/" className="text-xl font-bold text-gray-900">HSCode Master</a>
                     </div>
 
                     {/* 中间导航链接 */}
                     <nav className="hidden md:flex gap-8 text-sm font-medium text-gray-600">
-                        <a href="#" className="hover:text-blue-600 transition-colors">编码查询</a>
+                        <a href="/search" className="hover:text-blue-600 transition-colors">编码查询</a>
                         <a href="#" className="hover:text-blue-600 transition-colors">税率计算</a>
                         <a href="#" className="hover:text-blue-600 transition-colors">法规政策</a>
                         <a href="#" className="hover:text-blue-600 transition-colors">关于我们</a>

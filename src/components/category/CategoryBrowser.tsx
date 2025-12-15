@@ -51,7 +51,7 @@ export default function CategoryBrowser({ sections, initialSectionId }: Category
                     code: c.code,
                     name: c.name,
                     desc: "",
-                    count: 0
+                    count: c.count
                 }))}
             />
         </div>

@@ -5,19 +5,19 @@ import Link from 'next/link';
 interface ChapterItem {
     code: string;
     name: string;
-    desc: string;
-    count: number; // 该章下的编码数量
+    desc: string | null; // ✅ 修改：允许接收 null
+    count: number;
 }
 
 interface ChapterGridProps {
-    sectionName: string; // 当前选中的大类名称
+    sectionName: string;
     chapters: ChapterItem[];
 }
 
 export default function ChapterGrid({ sectionName, chapters }: ChapterGridProps) {
     return (
         <div className="flex-grow">
-            {/* 顶部标题区 */}
+            {/* ... 顶部标题区保持不变 ... */}
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{sectionName}</h1>
                 <p className="text-gray-500 text-sm">
@@ -25,15 +25,14 @@ export default function ChapterGrid({ sectionName, chapters }: ChapterGridProps)
                 </p>
             </div>
 
-            {/* 章节卡片网格 */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {chapters.map((chapter) => (
                     <Link
-                        href={`/search?chapter=${chapter.code}`} // 点击跳转到搜索页并带上参数
+                        href={`/search?chapter=${chapter.code}`}
                         key={chapter.code}
                         className="group block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-md transition-all relative overflow-hidden"
                     >
-                        {/* 装饰背景圆圈 */}
+                        {/* ... 装饰背景和图标保持不变 ... */}
                         <div className="absolute -right-4 -top-4 w-16 h-16 bg-gray-50 rounded-full group-hover:bg-blue-50 transition-colors"></div>
 
                         <div className="relative">
@@ -51,15 +50,16 @@ export default function ChapterGrid({ sectionName, chapters }: ChapterGridProps)
                                 {chapter.name}
                             </h3>
 
+                            {/* ✅ 修改：处理 desc 为空的情况，防止页面塌陷 */}
                             <p className="text-xs text-gray-500 line-clamp-2 mb-4 h-8">
-                                {chapter.desc}
+                                {chapter.desc || '暂无章节描述'}
                             </p>
 
                             <div className="pt-3 border-t border-gray-50 flex justify-between items-center text-xs">
                                 <span className="text-gray-400">包含条目</span>
                                 <span className="font-medium text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full">
-                  {chapter.count.toLocaleString()}
-                </span>
+                                  {chapter.count.toLocaleString()}
+                                </span>
                             </div>
                         </div>
                     </Link>
