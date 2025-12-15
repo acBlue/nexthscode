@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react'; // 1. 引入 useEffect
-import { Search, ChevronRight, SlidersHorizontal } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface SearchHeaderProps {
     initialQuery: string;
@@ -15,7 +17,6 @@ export default function SearchHeader({ initialQuery, total, showFilters, setShow
     const router = useRouter();
     const [query, setQuery] = useState(initialQuery);
 
-    // 2. 新增：当 URL 带来的 initialQuery 变化时，同步更新输入框
     useEffect(() => {
         setQuery(initialQuery);
     }, [initialQuery]);
@@ -30,38 +31,46 @@ export default function SearchHeader({ initialQuery, total, showFilters, setShow
     };
 
     return (
-        <div className="bg-white border-b border-gray-200 sticky top-16 z-30 shadow-sm">
+        <div className="bg-background border-b sticky top-16 z-30 shadow-sm supports-[backdrop-filter]:bg-background/60 backdrop-blur">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="h-16 flex items-center gap-4">
-
-                    <button
+                    
+                    {/* 筛选切换按钮 */}
+                    <Button
+                        variant={showFilters ? "secondary" : "ghost"}
+                        size="icon"
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`p-2 rounded-lg transition-colors ${showFilters ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'}`}
+                        className={showFilters ? "text-blue-600 bg-blue-50 hover:bg-blue-100" : "text-muted-foreground"}
                         title="切换筛选栏"
                     >
                         <SlidersHorizontal className="w-5 h-5" />
-                    </button>
+                    </Button>
 
+                    {/* 搜索框区域 */}
                     <div className="flex-grow max-w-2xl relative">
-                        <input
-                            type="text"
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="在此输入关键词、HS编码..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            className="w-full pl-10 pr-12 py-2 bg-gray-100 border-transparent focus:bg-white border focus:border-blue-500 rounded-md text-sm transition-all outline-none"
-                            placeholder="在此输入关键词、HS编码..."
+                            className="pl-9 pr-12 bg-muted/50 focus:bg-background transition-all"
                         />
-                        <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
-                        <button
+                        <Button 
+                            size="sm" 
+                            variant="ghost" 
                             onClick={handleSearch}
-                            className="absolute right-2 top-1.5 bg-white p-1 rounded hover:bg-gray-200 transition-colors"
+                            className="absolute right-1 top-1 h-8 w-8 p-0"
                         >
-                            <ChevronRight className="w-4 h-4 text-gray-500" />
-                        </button>
+                            <Search className="w-4 h-4" />
+                        </Button>
                     </div>
 
-                    <div className="flex items-center gap-3 ml-auto border-l border-gray-200 pl-4">
-                        <span className="text-xs text-gray-500 hidden sm:inline">共 <span className="font-bold text-gray-900">{total}</span> 条结果</span>
+                    {/* 结果统计 */}
+                    <div className="flex items-center gap-3 ml-auto border-l pl-4">
+                        <span className="text-xs text-muted-foreground hidden sm:inline">
+                            共 <span className="font-bold text-foreground">{total}</span> 条结果
+                        </span>
                     </div>
                 </div>
             </div>

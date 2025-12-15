@@ -120,3 +120,79 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* app/globals.css */
+
+@media print {
+  /* 1. 隐藏所有不必要的元素 */
+  nav,                /* 顶部导航栏 (Navbar) */
+  footer,             /* 底部 (Footer) */
+  button,             /* 所有的按钮 */
+  .no-print,          /* 自定义不想打印的类 */
+  [role="dialog"],    /* 弹窗 */
+  [data-radix-scroll-area-viewport] { /* 滚动条容器有时候会有问题，重置 */
+      overflow: visible !important; 
+  }
+
+  /* 2. 页面基础设置 */
+  @page {
+    margin: 15mm; /* 设置纸张边距 */
+    size: auto;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt; /* 打印字体稍微小一点更精致 */
+  }
+
+  /* 3. 强制展开所有内容 */
+  /* 防止卡片内部出现滚动条，导致打印内容不全 */
+  .scroll-area, 
+  .overflow-auto, 
+  .overflow-y-auto {
+      overflow: visible !important;
+      height: auto !important;
+      max-height: none !important;
+  }
+
+  /* 4. 样式重置：为了省墨和清晰 */
+  .bg-slate-50, 
+  .bg-gray-50, 
+  .bg-blue-50, 
+  .bg-amber-50,
+  .bg-background,
+  .bg-muted {
+      background-color: transparent !important; /* 去除背景色 */
+  }
+
+  /* 边框变成黑色线条 */
+  .border, .border-b, .border-l-4 {
+      border-color: #000 !important;
+  }
+  
+  /* 确保文字颜色是黑色 */
+  .text-blue-600, .text-blue-700, 
+  .text-amber-600, .text-emerald-600,
+  .text-muted-foreground {
+      color: #000 !important;
+  }
+
+  /* 5. 布局控制 */
+  /* 避免卡片被从中间切断到下一页 */
+  .break-inside-avoid {
+      break-inside: avoid;
+  }
+  
+  /* 强制把 Grid 布局在打印时改为简单的流式布局或者保持 Grid 但调整间距 */
+  /* 如果你的两列布局在A4纸上太挤，可以强制改为单列，如下： */
+  /* .lg\:grid-cols-12 {
+      display: block !important;
+  } 
+  .lg\:col-span-4, .lg\:col-span-8 {
+      width: 100% !important;
+      margin-bottom: 20px;
+  }
+  */
+}

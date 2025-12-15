@@ -6,8 +6,9 @@ import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { LoginSchema, RegisterSchema } from "@/lib/schemas";
-import { signIn } from "@/auth/auth"; // 引用我们配置好的 auth
-import { AuthError } from "next-auth";
+import { signIn,signOut} from "@/auth/auth"; // 引用我们配置好的 auth
+import { AuthError } from "next-auth"
+;
 
 // --- 注册 Action ---
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
@@ -74,4 +75,9 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
 
     return { success: "登录成功！" };
+};
+
+
+export const logout = async () => {
+  await signOut({ redirectTo: "/" });
 };

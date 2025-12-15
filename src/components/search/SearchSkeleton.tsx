@@ -1,70 +1,66 @@
 import React from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 
-// 单个卡片的骨架
 function CardSkeleton() {
     return (
-        <div className="bg-white rounded-lg border border-gray-200 p-5 animate-pulse">
-            <div className="flex justify-between items-start mb-3">
-                <div className="flex-grow space-y-3">
-                    {/* 标题行占位 */}
-                    <div className="flex items-center gap-3">
-                        <div className="h-6 w-32 bg-gray-200 rounded"></div>
-                        <div className="h-5 w-16 bg-gray-100 rounded"></div>
+        <Card className="border-muted">
+            <CardHeader className="pb-3 pt-5 px-5">
+                <div className="flex justify-between items-start">
+                    <div className="space-y-2 w-full">
+                        <div className="flex gap-3">
+                            <Skeleton className="h-7 w-32" /> {/* Code */}
+                            <Skeleton className="h-7 w-64" /> {/* Name */}
+                        </div>
                     </div>
-                    {/* 中文名占位 */}
-                    <div className="h-6 w-3/4 bg-gray-200 rounded"></div>
-                    {/* 英文名占位 */}
-                    <div className="h-4 w-1/2 bg-gray-100 rounded"></div>
                 </div>
-                {/* 星星图标占位 */}
-                <div className="h-6 w-6 bg-gray-100 rounded-full"></div>
-            </div>
-
-            {/* 数据网格占位 (4个方块) */}
-            <div className="grid grid-cols-4 gap-1 mt-4 mb-4 bg-gray-50 rounded-lg p-3 border border-gray-100">
-                {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="flex flex-col items-center gap-2">
-                        <div className="h-3 w-12 bg-gray-200 rounded"></div>
-                        <div className="h-5 w-10 bg-gray-200 rounded"></div>
+            </CardHeader>
+            <CardContent className="px-5 pb-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div className="space-y-3">
+                        <Skeleton className="h-4 w-20" />
+                        <div className="grid grid-cols-2 gap-3">
+                            <Skeleton className="h-16 w-full rounded-md" />
+                            <Skeleton className="h-16 w-full rounded-md" />
+                        </div>
                     </div>
-                ))}
-            </div>
-
-            {/* 底部按钮行占位 */}
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                <div className="h-4 w-24 bg-gray-100 rounded"></div>
-                <div className="flex gap-3">
-                    <div className="h-8 w-20 bg-gray-200 rounded"></div>
-                    <div className="h-8 w-16 bg-blue-100 rounded"></div>
-                </div>
-            </div>
-        </div>
+                    <div className="space-y-3">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-12 w-full rounded-md" />
+                        <div className="flex gap-2">
+                             <Skeleton className="h-6 w-24" />
+                             <Skeleton className="h-6 w-24" />
+                        </div>
+                    </div>
+                 </div>
+            </CardContent>
+            <CardFooter className="py-3 px-5 bg-muted/20 flex justify-between">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-8 w-20" />
+            </CardFooter>
+        </Card>
     );
 }
 
 export default function SearchSkeleton() {
     return (
         <div className="flex gap-6 items-start animate-in fade-in duration-500">
-
-            {/* 1. 左侧侧边栏骨架 (PC端显示) */}
-            <aside className="w-64 flex-shrink-0 hidden md:block space-y-6">
-                <div className="h-4 w-20 bg-gray-200 rounded mb-4"></div>
+            {/* 侧边栏骨架 */}
+            <aside className="w-64 flex-shrink-0 hidden md:block space-y-6 mt-2">
+                <Skeleton className="h-5 w-24 mb-4" />
                 <div className="space-y-3">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="h-4 w-4 bg-gray-200 rounded"></div>
-                                <div className="h-4 w-32 bg-gray-100 rounded"></div>
-                            </div>
-                            <div className="h-4 w-6 bg-gray-100 rounded-full"></div>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                        <div key={i} className="flex items-center gap-2">
+                            <Skeleton className="h-4 w-4 rounded" />
+                            <Skeleton className="h-4 flex-grow" />
+                            <Skeleton className="h-4 w-8" />
                         </div>
                     ))}
                 </div>
             </aside>
 
-            {/* 2. 右侧结果列表骨架 */}
+            {/* 结果列表骨架 */}
             <div className="flex-grow space-y-4">
-                {/* 模拟 5 个卡片 */}
                 {[1, 2, 3, 4, 5].map((i) => (
                     <CardSkeleton key={i} />
                 ))}

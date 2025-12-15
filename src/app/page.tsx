@@ -1,29 +1,29 @@
-import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
-import CategoryGrid from '@/components/CategoryGrid';
-import Stats from '@/components/Stats';
-import Footer from '@/components/Footer';
-import { getHomeCategories } from '@/services/category.service'; // 1. 引入 Service
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import HeroSection from "@/components/home/HeroSection";
+import CategoryGrid from "@/components/home/CategoryGrid";
+import { getHomeCategories } from "@/services/category.service";
+
+// 强制动态渲染 (如果分类数据不常变，也可以去掉这行用缓存)
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
-    // 2. 在服务端获取数据 (这一步会自动走缓存)
-    // 注意：这个操作发生在服务器端，不会暴露数据库连接给前端
-    const categories = await getHomeCategories();
+  // 获取分类数据 (服务端)
+  const categories = await getHomeCategories();
 
-    // 为了首页排版美观，我们可能只想展示前 8 个或者特定的几个
-    // 这里简单取前 8 个展示
-    const displayCategories = categories.slice(0, 8);
+  return (
+    <div className="min-h-screen flex flex-col bg-background font-sans antialiased">
+      <Navbar />
+      
+      <main className="flex-grow">
+        {/* 1. 顶部 Hero 搜索区 */}
+        <HeroSection />
 
-    return (
-        <div className="min-h-screen bg-gray-50 font-sans">
-            <Navbar />
-            <main>
-                <Hero />
-                {/* 3. 将真实数据传递给组件 */}
-                <CategoryGrid categories={displayCategories} />
-                <Stats />
-            </main>
-            <Footer />
-        </div>
-    );
+        {/* 2. 分类列表区 */}
+        <CategoryGrid items={categories} />
+      </main>
+
+      <Footer />
+    </div>
+  );
 }

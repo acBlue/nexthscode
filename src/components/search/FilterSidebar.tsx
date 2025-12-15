@@ -1,71 +1,84 @@
 "use client";
 
 import React from 'react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 export interface FilterGroup {
-    id: string; // 章节 Code (如 "85")
+    id: string;
     name: string;
     count: number;
 }
 
 interface FilterSidebarProps {
     chapters: FilterGroup[];
-    selectedChapters: string[]; // 接收当前选中的章节
-    onToggleChapter: (code: string) => void; // 回调函数
+    selectedChapters: string[];
+    onToggleChapter: (code: string) => void;
 }
 
 export default function FilterSidebar({ chapters, selectedChapters, onToggleChapter }: FilterSidebarProps) {
     return (
         <aside className="w-64 flex-shrink-0 hidden md:block">
             <div className="sticky top-36 space-y-6 pr-2">
-
-                <div className="pb-4 border-b border-gray-200">
-                    <h3 className="text-sm font-bold text-gray-900 mb-3">相关章节</h3>
-
+                
+                <div className="space-y-3">
+                    <h3 className="text-sm font-semibold leading-none">相关章节</h3>
+                    <Separator />
+                    
                     {chapters.length === 0 ? (
-                        <p className="text-xs text-gray-400">当前结果暂无分类信息</p>
+                        <p className="text-xs text-muted-foreground py-2">无相关分类</p>
                     ) : (
-                        // 1. 修改样式：移除 max-h-60，改为 max-h-[70vh] 或者直接不限高
-                        // 这里我用 max-h-[calc(100vh-200px)] 让它自适应屏幕高度，避免双重滚动条
-                        <div className="space-y-2 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar pr-2">
-                            {chapters.map((chapter) => {
-                                const isChecked = selectedChapters.includes(chapter.id);
-                                return (
-                                    <label key={chapter.id} className="flex items-center gap-2 group cursor-pointer hover:bg-gray-50 p-1 rounded-md -ml-1 transition-colors">
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                className="peer w-4 h-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
-                                                // 2. 绑定选中状态和事件
+                        // 使用 ScrollArea 控制高度
+                        <ScrollArea className="h-[calc(100vh-300px)] pr-3">
+                            <div className="space-y-3">
+                                {chapters.map((chapter) => {
+                                    const isChecked = selectedChapters.includes(chapter.id);
+                                    return (
+                                        <div key={chapter.id} className="flex items-start space-x-2 group">
+                                            <Checkbox 
+                                                id={`chapter-${chapter.id}`} 
                                                 checked={isChecked}
-                                                onChange={() => onToggleChapter(chapter.id)}
+                                                onCheckedChange={() => onToggleChapter(chapter.id)}
+                                                className="mt-0.5 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                                             />
+                                            <div className="grid gap-1.5 leading-none w-full">
+                                                <Label
+                                                    htmlFor={`chapter-${chapter.id}`}
+                                                    className={`text-sm font-normal cursor-pointer leading-tight ${
+                                                        isChecked ? 'text-blue-700 font-medium' : 'text-muted-foreground'
+                                                    }`}
+                                                >
+                                                    {chapter.name}
+                                                </Label>
+                                                <div className="flex justify-end">
+                                                    <span className="text-[10px] bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded-sm">
+                                                        {chapter.count}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <span className={`text-sm truncate flex-grow ${isChecked ? 'text-blue-700 font-medium' : 'text-gray-600'}`} title={chapter.name}>
-                      {chapter.name}
-                    </span>
-                                        <span className="text-xs text-gray-400 bg-gray-100 px-1.5 rounded-full">
-                      {chapter.count}
-                    </span>
-                                    </label>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        </ScrollArea>
                     )}
                 </div>
 
-                {/* 监管条件 (静态展示) */}
-                <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-3">监管条件</h3>
+                {/* 监管条件示例 */}
+                <div className="space-y-3">
+                    <h3 className="text-sm font-semibold leading-none">监管类型</h3>
+                    <Separator />
                     <div className="flex flex-wrap gap-2">
                         {['3C认证', '进口许可证', '自动进口许可'].map((tag, i) => (
-                            <span key={i} className="px-2 py-1 bg-white border border-gray-200 rounded text-xs text-gray-600 cursor-pointer hover:border-blue-400 hover:text-blue-600 transition-colors">
-                 {tag}
-               </span>
+                            <Badge key={i} variant="outline" className="cursor-pointer hover:border-blue-400 hover:text-blue-600 transition-colors font-normal">
+                                {tag}
+                            </Badge>
                         ))}
                     </div>
                 </div>
-
             </div>
         </aside>
     );
