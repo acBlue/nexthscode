@@ -6,8 +6,6 @@ import SearchSkeleton from '@/components/search/SearchSkeleton';
 // 1. ✅ 修复导入 (去掉 .ts) 并引入 getChapterFacets
 import { searchHsCodes, getChapterFacets } from '@/services/hscode.service';
 
-export const runtime = 'edge';
-
 interface SearchPageProps {
     searchParams: Promise<{
         q?: string;

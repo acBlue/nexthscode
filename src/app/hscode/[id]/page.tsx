@@ -10,8 +10,6 @@ import { ArrowDownCircle, ArrowUpCircle, Globe, Shield, Scale, Microscope, Layer
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export const runtime = 'edge';
-
 interface DetailPageProps {
   params: Promise<{ id: string }>;
 }

@@ -3,8 +3,6 @@ import { SettingsForm } from "@/components/auth/SettingsForm";
 import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/Navbar";
 
-export const runtime = 'edge';
-
 export default async function ProfilePage() {
   const session = await auth();
 
