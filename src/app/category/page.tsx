@@ -3,6 +3,8 @@ import Footer from '@/components/Footer';
 import CategoryBrowser from '@/components/category/CategoryBrowser';
 import { getAllSectionsWithChapters } from '@/services/category.service';
 
+export const runtime = 'edge';
+
 // 1. 修改接口定义：searchParams 必须被定义为 Promise
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

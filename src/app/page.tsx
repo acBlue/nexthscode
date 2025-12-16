@@ -7,6 +7,8 @@ import { getHomeCategories } from "@/services/category.service";
 // 强制动态渲染 (如果分类数据不常变，也可以去掉这行用缓存)
 export const dynamic = "force-dynamic";
 
+export const runtime = 'edge';
+
 export default async function Home() {
   // 获取分类数据 (服务端)
   const categories = await getHomeCategories();
