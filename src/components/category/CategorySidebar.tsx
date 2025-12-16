@@ -1,14 +1,10 @@
 import React from 'react';
-import { Layers } from 'lucide-react';
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Layers, ChevronRight } from 'lucide-react';
 
+// 定义分类的数据结构
 interface SectionItem {
     id: string;
-    roman: string;
+    roman: string; // 罗马数字 (I, II...)
     name: string;
 }
 
@@ -20,59 +16,46 @@ interface SidebarProps {
 
 export default function CategorySidebar({ sections, activeId, onSelect }: SidebarProps) {
     return (
-        <div className={cn(
-            "w-full md:w-72 flex-shrink-0 bg-background border rounded-xl shadow-sm flex flex-col overflow-hidden",
-            // 移动端：限制最大高度，允许滚动
-            "h-auto max-h-[40vh]",
-            // 桌面端：固定高度计算，配合 Sticky 使用
-            "md:h-[calc(100vh-140px)]" 
-        )}>
-            {/* 顶部标题区 - 固定不滚动 */}
-            <div className="p-4 flex items-center gap-2 flex-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
-                <Layers className="w-5 h-5 text-primary" />
-                <h2 className="font-semibold text-foreground">分类导航</h2>
+        <aside className="w-full md:w-72 flex-shrink-0 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden h-fit">
+            <div className="p-4 border-b border-gray-100 bg-gray-50">
+                <h2 className="font-bold text-gray-900 flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-blue-600" />
+                    海关编码大类
+                </h2>
             </div>
-            
-            <Separator className="flex-none" />
-            
-            {/* 滚动区域 - 关键修复：flex-1 和 min-h-0 确保 ScrollArea 在 flex 容器内生效 */}
-            <div className="flex-1 min-h-0 relative">
-                <ScrollArea className="h-full w-full">
-                    <div className="p-2 flex flex-col gap-1">
-                        {sections.map((section) => {
-                            const isActive = activeId === section.id;
-                            return (
-                                <Button
-                                    key={section.id}
-                                    variant={isActive ? "secondary" : "ghost"}
-                                    // 添加 whitespace-normal 和 h-auto 确保长文本能换行且不溢出
-                                    className={cn(
-                                        "w-full justify-start h-auto py-3 px-3 text-left whitespace-normal font-normal",
-                                        isActive && "bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-100 font-medium"
-                                    )}
+
+            {/* 列表区域：设置最大高度和滚动，防止页面过长 */}
+            <div className="max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+                <ul className="divide-y divide-gray-50">
+                    {sections.map((section) => {
+                        const isActive = activeId === section.id;
+                        return (
+                            <li key={section.id}>
+                                <button
                                     onClick={() => onSelect(section.id)}
+                                    className={`w-full text-left px-4 py-3.5 flex items-start gap-3 transition-all hover:bg-gray-50 ${
+                                        isActive
+                                            ? 'bg-blue-50/60 border-l-4 border-blue-600'
+                                            : 'border-l-4 border-transparent'
+                                    }`}
                                 >
-                                    <div className="flex gap-3 items-start w-full min-w-0">
-                                        <Badge 
-                                            variant={isActive ? "default" : "outline"}
-                                            className={cn(
-                                                "mt-0.5 px-1.5 min-w-[32px] justify-center flex-shrink-0",
-                                                isActive ? "bg-blue-600 hover:bg-blue-700" : "text-muted-foreground border-border"
-                                            )}
-                                        >
-                                            {section.roman}
-                                        </Badge>
-                                        {/* truncate 配合 line-clamp 防止文字横向溢出 */}
-                                        <span className="text-sm leading-tight line-clamp-2 break-words">
-                                            {section.name}
-                                        </span>
-                                    </div>
-                                </Button>
-                            );
-                        })}
-                    </div>
-                </ScrollArea>
+                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded border ${
+                      isActive
+                          ? 'bg-blue-100 text-blue-700 border-blue-200'
+                          : 'bg-gray-100 text-gray-500 border-gray-200'
+                  }`}>
+                    {section.roman}
+                  </span>
+                                    <span className={`text-sm font-medium line-clamp-2 ${isActive ? 'text-blue-700' : 'text-gray-700'}`}>
+                    {section.name}
+                  </span>
+                                    {isActive && <ChevronRight className="w-4 h-4 text-blue-500 ml-auto mt-0.5" />}
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ul>
             </div>
-        </div>
+        </aside>
     );
 }
