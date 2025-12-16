@@ -29,7 +29,7 @@ export default function HeroSection() {
         
         {/* 顶部小标签 */}
         <Badge variant="secondary" className="mb-4 px-3 py-1 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 gap-1">
-          <Sparkles className="w-3.5 h-3.5" /> 2024 新版海关编码库已更新
+          <Sparkles className="w-3.5 h-3.5" /> 2025 新版海关编码库已更新
         </Badge>
 
         <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">

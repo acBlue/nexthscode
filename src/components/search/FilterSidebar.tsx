@@ -66,7 +66,7 @@ export default function FilterSidebar({ chapters, selectedChapters, onToggleChap
                         </ScrollArea>
                     )}
                 </div>
-                
+
             </div>
         </aside>
     );
