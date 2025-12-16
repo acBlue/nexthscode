@@ -25,8 +25,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # 禁用 Next.js 遥测
-ENV NEXT_TELEMETRY_DISABLED 1
-
+ENV NEXT_TELEMETRY_DISABLED=1
+# 修复报错：添加临时构建用变量
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 # 构建项目
 RUN pnpm run build
 
