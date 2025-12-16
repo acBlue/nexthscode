@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   allowedDevOrigins: [ 'localhost:3000'],
   productionBrowserSourceMaps: false,
+  output: 'standalone',
 
 };
 

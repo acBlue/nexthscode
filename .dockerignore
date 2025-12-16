@@ -1,0 +1,16 @@
+Dockerfile
+.dockerignore
+.git
+.github
+.next
+node_modules
+npm-debug.log
+pnpm-debug.log
+README.md
+
+# 忽略环境文件（重要！防止私钥泄露）
+.env
+.env*.local
+
+# --- 忽略不需要打包的数据文件 ---
+src/db/data
