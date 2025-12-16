@@ -1,7 +1,7 @@
 # ---------------------------------------------------
 # 1. 依赖安装层 (Deps)
 # ---------------------------------------------------
-FROM node:18-alpine AS deps
+FROM node:24-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -17,7 +17,7 @@ RUN pnpm install --frozen-lockfile
 # ---------------------------------------------------
 # 2. 构建层 (Builder)
 # ---------------------------------------------------
-FROM node:18-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
