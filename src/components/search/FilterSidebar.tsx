@@ -66,19 +66,7 @@ export default function FilterSidebar({ chapters, selectedChapters, onToggleChap
                         </ScrollArea>
                     )}
                 </div>
-
-                {/* 监管条件示例 */}
-                <div className="space-y-3">
-                    <h3 className="text-sm font-semibold leading-none">监管类型</h3>
-                    <Separator />
-                    <div className="flex flex-wrap gap-2">
-                        {['3C认证', '进口许可证', '自动进口许可'].map((tag, i) => (
-                            <Badge key={i} variant="outline" className="cursor-pointer hover:border-blue-400 hover:text-blue-600 transition-colors font-normal">
-                                {tag}
-                            </Badge>
-                        ))}
-                    </div>
-                </div>
+                
             </div>
         </aside>
     );
