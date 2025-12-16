@@ -1,72 +1,69 @@
 import { db } from '@/lib/db';
 import { hscodes, chapters } from '@/db/schema';
-import { like, or, and, ilike, eq, inArray, count, desc, asc, SQL } from 'drizzle-orm';
+// 1. ✅ 核心修复：添加 sql 导入
+import { like, or, and, ilike, eq, inArray, count, desc, asc, SQL, sql } from 'drizzle-orm';
 import { unstable_cache } from 'next/cache';
 
 export interface SearchParams {
     q?: string;
     page?: number;
     pageSize?: number;
-    chapters?: string[]; // 接收章节 Code 数组 (e.g. ['85', '90'])
+    chapters?: string[];
 }
 
+// ==========================================
+// 1. 搜索主逻辑
+// ==========================================
 export async function searchHsCodes({ q, page = 1, pageSize = 10, chapters: selectedChapters }: SearchParams) {
     const cleanQuery = q?.trim() || "";
     const offset = (page - 1) * pageSize;
 
-    // 1. 动态构造 Where 条件数组
-    const conditions: (SQL | undefined)[] = [];
+    // 构造搜索条件
+    const searchConditions: (SQL | undefined)[] = [];
 
-    // A. 关键词模糊搜索 (如果有)
+    // A. 关键词搜索
     if (cleanQuery) {
-        conditions.push(or(
-            ilike(hscodes.code, `%${cleanQuery}%`),       // 搜编码
-            ilike(hscodes.cleanCode, `%${cleanQuery}%`),  // 搜纯数字
-            ilike(hscodes.name, `%${cleanQuery}%`),       // 搜中文名
+        searchConditions.push(or(
+            ilike(hscodes.code, `%${cleanQuery}%`),
+            ilike(hscodes.cleanCode, `%${cleanQuery}%`),
+            ilike(hscodes.name, `%${cleanQuery}%`),
         ));
     }
 
+    // B. 章节筛选
     if (selectedChapters && selectedChapters.length > 0) {
-        // 1. 先查出 '85', '90' 对应的数据库 UUID
+        // 先查出章节 ID
         const chapterRecords = await db.query.chapters.findMany({
             where: inArray(chapters.code, selectedChapters),
             columns: { id: true }
         });
-
         const chapterIds = chapterRecords.map(c => c.id);
 
-        // 2. 如果查到了 ID，就加到筛选条件里
         if (chapterIds.length > 0) {
-            conditions.push(inArray(hscodes.chapterId, chapterIds));
+            searchConditions.push(inArray(hscodes.chapterId, chapterIds));
         } else {
-            // 选了章节但数据库没查到 ID？那应该返回空结果
-            // 这里推入一个永远为假的条件，或者直接返回空
-            conditions.push(eq(hscodes.id, 'impossible-id'));
+            searchConditions.push(eq(hscodes.id, 'impossible-id'));
         }
     }
 
+    const finalWhere = and(...searchConditions);
 
     // 2. 执行查询 (Results)
     const results = await db.query.hscodes.findMany({
-        where: and(...conditions),
+        where: finalWhere,
         with: {
-        chapter: true,
+            chapter: true,
         },
         orderBy: [asc(hscodes.code)],
         limit: pageSize,
         offset: offset,
-        // Drizzle 默认会返回所有字段，这很好
     });
 
     // 3. 执行统计 (Total Count)
-    // Drizzle 需要用 select({ value: count() }) 来统计
     const totalRes = await db
         .select({ value: count() })
         .from(hscodes)
-        // 注意：这里如果涉及关联表的筛选 (比如章节)，纯 select 需要手动 leftJoin
-        // 如果上面的 conditions 里只有 hscodes 本表的字段，可以直接用
-        // 如果有 chapterId 的筛选，也是本表字段，可以直接用。
-        .where(and(...conditions));
+        .where(finalWhere);
 
     return {
         data: results,
@@ -74,21 +71,60 @@ export async function searchHsCodes({ q, page = 1, pageSize = 10, chapters: sele
     };
 }
 
-// 详情页 Service (保持不变，确认一下语法即可)
+// ==========================================
+// 2. ✅ 补全：章节聚合统计 (用于侧边栏筛选)
+// ==========================================
+export const getChapterFacets = async (query: string) => {
+    const cleanQuery = query?.trim() || "";
+
+    // 仅使用搜索关键词条件，不应用章节筛选，
+    // 这样用户即使勾选了某一章，也能看到其他章有多少结果
+    const searchCondition = cleanQuery
+        ? or(
+            ilike(hscodes.code, `%${cleanQuery}%`),
+            ilike(hscodes.cleanCode, `%${cleanQuery}%`),
+            ilike(hscodes.name, `%${cleanQuery}%`)
+        )
+        : undefined;
+
+    // 聚合查询: Group By Chapter + Count
+    const facets = await db
+        .select({
+            code: chapters.code,      // 章节代码 (85)
+            name: chapters.name,      // 章节名称
+            count: sql<number>`count(*)`, // 统计数量
+        })
+        .from(hscodes)
+        .leftJoin(chapters, eq(hscodes.chapterId, chapters.id)) // 关联查询
+        .where(searchCondition)
+        .groupBy(chapters.code, chapters.name)
+        .orderBy(asc(chapters.code)); // 按数量倒序
+
+    // 格式化返回
+    return facets.map(item => ({
+        id: item.code || 'unknown',
+        name: `第 ${item.code} 章 ${item.name || ''}`,
+        count: Number(item.count),
+    }));
+};
+
+// ==========================================
+// 3. 详情页查询
+// ==========================================
 export const getHsCodeDetail = unstable_cache(
-  async (cleanCode: string) => {
-    const data = await db.query.hscodes.findFirst({
-      where: eq(hscodes.cleanCode, cleanCode),
-      with: {
-        chapter: {
-          with: {
-            section: true,
-          },
-        },
-      },
-    });
-    return data;
-  },
-  ['hscode-detail-v2'], // 修改缓存 Key，强制刷新缓存
-  { revalidate: 604800 }
+    async (cleanCode: string) => {
+        const data = await db.query.hscodes.findFirst({
+            where: eq(hscodes.cleanCode, cleanCode),
+            with: {
+                chapter: {
+                    with: {
+                        section: true,
+                    },
+                },
+            },
+        });
+        return data;
+    },
+    ['hscode-detail-v3'],
+    { revalidate: 604800 }
 );
