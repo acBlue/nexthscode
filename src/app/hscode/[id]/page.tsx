@@ -26,11 +26,16 @@ export default async function DetailPage({ params }: DetailPageProps) {
     <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900 pb-20">
       <Navbar />
 
-      <DetailHeader 
-        hscode={data.code} 
-        name={data.name} 
-        nameEn={""}
-      />
+        <DetailHeader
+            hscode={data.code}
+            name={data.name}
+            nameEn={""} // 如果数据库有英文名字段，这里可以填 data.nameEn
+            rates={{
+                mfn: data.mfnRate,          // 最惠国税率
+                vat: data.vatRate,          // 增值税率
+                consumption: data.consumptionRate // 消费税率
+            }}
+        />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         

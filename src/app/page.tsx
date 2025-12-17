@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Stats from "@/components/Stats";
 import HeroSection from "@/components/home/HeroSection";
 import CategoryGrid from "@/components/home/CategoryGrid";
 import { getHomeCategories } from "@/services/category.service";
@@ -21,6 +22,8 @@ export default async function Home() {
 
         {/* 2. 分类列表区 */}
         <CategoryGrid items={categories} />
+
+          <Stats />
       </main>
 
       <Footer />
