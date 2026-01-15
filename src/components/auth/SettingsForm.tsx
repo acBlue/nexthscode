@@ -89,19 +89,13 @@ export const SettingsForm = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">账户设置</h3>
-                <p className="text-sm text-muted-foreground">
-                    管理您的个人资料、密码及账户偏好。
-                </p>
-            </div>
-            <Separator/>
-
             <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-                    <TabsTrigger value="general">基本资料</TabsTrigger>
-                    <TabsTrigger value="security">安全设置</TabsTrigger>
-                </TabsList>
+                <div className="flex items-center justify-between mb-4">
+                     <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+                        <TabsTrigger value="general">基本资料</TabsTrigger>
+                        <TabsTrigger value="security">安全设置</TabsTrigger>
+                    </TabsList>
+                </div>
 
                 {/* --- Tab 1: 基本资料 --- */}
                 <TabsContent value="general">

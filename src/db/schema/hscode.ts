@@ -2,7 +2,7 @@ import { pgTable, text, uuid, timestamp, jsonb, index, uniqueIndex } from 'drizz
 import { relations } from 'drizzle-orm';
 
 // 1. 大类表 (Section)
-export const sections = pgTable('Section', {
+export const sections = pgTable('section', {
     id: uuid('id').defaultRandom().primaryKey(),
     code: text('code').notNull().unique(), // I, II, XVI
     name: text('name').notNull(),
@@ -14,7 +14,7 @@ export const sectionsRelations = relations(sections, ({ many }) => ({
 }));
 
 // 2. 章节表 (Chapter)
-export const chapters = pgTable('Chapter', {
+export const chapters = pgTable('chapter', {
     id: uuid('id').defaultRandom().primaryKey(),
     code: text('code').notNull().unique(), // 85
     name: text('name').notNull(),
@@ -33,7 +33,7 @@ export const chaptersRelations = relations(chapters, ({ one, many }) => ({
 
 // 3. 海关编码表 (HsCode)
 // 3. 海关编码表 (HsCode) - 包含你的新字段
-export const hscodes = pgTable('HsCode', {
+export const hscodes = pgTable('hscode', {
   id: uuid('id').defaultRandom().primaryKey(),
   
   // --- 核心识别码 ---
@@ -86,8 +86,8 @@ export const hscodes = pgTable('HsCode', {
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 }, (table) => {
   return {
-    cleanCodeIdx: index('HsCode_cleanCode_idx').on(table.cleanCode),
-    nameIdx: index('HsCode_name_idx').on(table.name),
+    cleanCodeIdx: index('hsode_cleanCode_idx').on(table.cleanCode),
+    nameIdx: index('hscode_name_idx').on(table.name),
   };
 });
 
