@@ -19,7 +19,7 @@ export default function Footer() {
                     <ul className="space-y-2 text-sm">
                         <li><a href="#" className="hover:text-white">首页</a></li>
                         <li><a href="/search" className="hover:text-white">编码查询</a></li>
-                        <li><a href="/tools/tax" className="hover:text-white">税率计算器</a></li>
+                        <li><a href="/tools/tax" className="hover:text-white">税费计算器</a></li>
                     </ul>
                 </div>
                 <div>

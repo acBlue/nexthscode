@@ -88,7 +88,7 @@ export default function CIFCalculator({ initialRates }: CIFCalculatorProps) {
                             <div className="p-1.5 bg-blue-100 text-blue-600 rounded-md">
                                 <CalcIcon className="w-4 h-4" />
                             </div>
-                            参数录入
+                            CIF参数
                         </CardTitle>
                     </CardHeader>
 
