@@ -68,11 +68,29 @@ export const getAllSectionsWithChapters = unstable_cache(
 // 首页的大类列表
 export const getHomeCategories = unstable_cache(
     async () => {
-        const result = await db.query.sections.findMany({
-            orderBy: [asc(sections.code)],
-        });
-        return result.map((r) => ({ id: r.id, code: r.code, name: r.name }));
+        try {
+            const result = await db.query.sections.findMany({
+                orderBy: [asc(sections.code)],
+            });
+            if (result && result.length > 0) {
+                return result.map((r) => ({ id: r.id, code: r.code, name: r.name }));
+            }
+        } catch (error) {
+            console.error("Warning: Failed to fetch sections from DB, using fallback static data.", error);
+        }
+
+        // 兜底静态数据
+        try {
+            const hsStructure = (await import('@/db/data/hs_structure.json')).default;
+            return hsStructure.map((s) => ({
+                id: s.code,
+                code: s.code,
+                name: s.name,
+            }));
+        } catch {
+            return [];
+        }
     },
-    ['home-sections-drizzle'],
+    ['home-sections-drizzle-v3'],
     { revalidate: 86400 }
 );

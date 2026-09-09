@@ -1,22 +1,15 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
-import { auth } from "@/auth/auth";
-import { UserNav } from "@/components/auth/UserNav";
+import { NavbarUser, NavbarUserSkeleton } from "@/components/auth/NavbarUser";
 import { 
   Search, 
   Layers, 
   Calculator, 
   Compass, 
-  Sparkles,
   ShieldCheck,
-  Menu
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-export default async function Navbar() {
-  const session = await auth();
-  const user = session?.user;
-
+export default function Navbar() {
   return (
     <header className="bg-white/85 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,25 +84,10 @@ export default async function Navbar() {
 
             <div className="h-4 w-px bg-slate-200 hidden sm:block" />
 
-            {/* 用户状态 */}
-            {user ? (
-              <UserNav user={user} />
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link 
-                  href="/login" 
-                  className="text-sm font-medium text-slate-600 hover:text-blue-600 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors"
-                >
-                  登录
-                </Link>
-                <Link 
-                  href="/register" 
-                  className="text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-1.5 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm hover:shadow-md hover:shadow-blue-500/20 active:scale-95"
-                >
-                  免费注册
-                </Link>
-              </div>
-            )}
+            {/* 用户状态异步流式挂载，不阻塞整体页面渲染 */}
+            <Suspense fallback={<NavbarUserSkeleton />}>
+              <NavbarUser />
+            </Suspense>
             
           </div>
         </div>
