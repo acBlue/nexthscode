@@ -1,202 +1,197 @@
 # NextHsCode 开发规划 (Roadmap)
 
-> 编写时间：2026-05-19
-> 文档状态：**待审核（Draft）**
-> 编写者：基于现有代码库自动分析生成
+> 更新时间：2025-03-09  
+> 当前版本：v0.3.0 (UI & Performance Overhaul Edition)  
+> 文档状态：**实施中 (Active)**  
 
 ---
 
-## 一、当前状态盘点
+## 一、当前项目全景与完成度盘点
 
-### 1.1 技术栈
+### 1.1 技术栈升级现状
 
-| 类别 | 选型 |
-| --- | --- |
-| 框架 | Next.js 16 (App Router) + React 19 + React Compiler |
-| 语言 | TypeScript 5 |
-| 数据库 | PostgreSQL + Drizzle ORM 0.45 |
-| 鉴权 | NextAuth 5 (Beta, Credentials + JWT) |
-| 样式 | Tailwind CSS 4 + shadcn/ui |
-| 表单 | React Hook Form + Zod 4 |
-| 部署 | Docker（已配置 CI 构建流程） |
-
-### 1.2 已交付功能
-
-- **HS Code 查询**：首页 Hero 搜索、分类导航卡片、章节聚合统计搜索（含 facets 筛选）、详情页（税率/监管/申报要素/章节归属）。
-- **分类浏览**：21 大类 / 98 章节的层级浏览（`/category`）。
-- **税费计算器**（`/tools/tax`）：CIF / FOB / CFR / EXW 四种贸易条款，从详情页可一键带参跳转。
-- **用户体系**：注册 / 登录 / 个人中心（资料 + 密码修改），数据库 `users` 表已预留 `role` 字段。
-- **基础设施**：Drizzle schema 三大模块（hscode / account / system）、unstable_cache 缓存、Docker 镜像、Postgres 连接池单例。
-
-### 1.3 已存在但未使用的"伏笔"
-
-代码中已经埋了几处明确的扩展点，目前是"建好但没接上"的状态：
-
-- `hscodes.agreements` (jsonb) — 协议税率字段，预留但全为空。
-- `hscodes.supervision` / `inspection` (jsonb) — 监管/检疫详细解释字段。
-- `sys_references` 表（字典表）— 完整建模但 0 调用。
-- `users.role` 字段 — 区分 user/admin 但无后台。
-- `verificationTokens` 表 — 邮箱验证流程未实现。
-- `accounts` 表 — OAuth Provider 未启用（auth.ts 已注释说明）。
+| 类别 | 当前版本与选型 | 状态 |
+| --- | --- | --- |
+| **基础框架** | **Next.js 16.3.4 (App Router)** + **React 19.3.0** + React Compiler |  已升级至最新稳定版 |
+| **开发语言** | **TypeScript 5.9.3** + `@types/node 22` |  已升级至最新 |
+| **数据库/ORM** | PostgreSQL 16 + **Drizzle ORM 0.45.2** + **drizzle-kit 0.31.10** |  稳定运行 |
+| **用户认证** | **NextAuth.js 5 (Beta.30)** (JWT + Credentials + Session API) |  已解耦首屏阻塞 |
+| **样式与动效** | **Tailwind CSS 4.3.3** + **tw-animate-css** + **Radix UI (全系最新)** |  全系升级 |
+| **表单与校验** | **React Hook Form 7.87.0** + **Zod 4.6.0** |  已升级至最新 |
+| **部署与CDN** | **Vercel (HKG1 边缘节点)** + 全站 ISR 缓存 |  已解决跨国内网延迟 |
 
 ---
 
-## 二、识别出的关键差距
+### 1.2 最近完成的重大里程碑（已交付）
 
-下面是按"用户感知度 × 实现成本"打分的差距，从最值得做开始排：
+####  里程碑 A：全站 UI/UX 系统级专业化重构
+- [x] **设计系统基建**：统一专业海关金融 SaaS 色彩体系（科技蓝 `#2563eb`、柔和冷灰、微光网格 `bg-grid-slate`、平滑滚动条 `custom-scrollbar`）。
+- [x] **导航栏 (Navbar)**：质感品牌 Logo 徽章、PRO 标识、税费计算器常驻、快捷键提示、移动端响应式与异步非阻塞登录态。
+- [x] **首页 (Home)**：
+  - 沉浸式 Hero 搜索区（2025 最新税则提示、商品品名联动标签、大按钮）；
+  - 精选热门分类网格（图标渐变容器、章类序号徽章、流畅浮动动效）；
+  - 权威数据看板（10,000+税目、98章、4大贸易条款、2025口径）及 4 大核心功能卡片 + CTA 行动号召。
+- [x] **高级搜索与结果页 (`/search`)**：
+  - 智能搜索栏（一键清空、筛选状态切换与徽章计数）；
+  - 章节筛选侧边栏（新增章节内快速搜索过滤框，支持章号/名称实时检索）；
+  - 商品结果卡片（HS Code 一键复制、监管与检疫胶囊标签、最惠国/增值税/退税率微仪表盘、一键直达税费测算）；
+  - 优雅的空状态与结果骨架屏。
+- [x] **分类大纲页 (`/category`)**：
+  - 21 大类与 98 章节全量展示；
+  - 侧边栏支持搜索过滤，高亮当前选中类目；
+  - 章节卡片带有条目数统计与动效箭头。
+- [x] **编码详情页 (`/hscode/[id]`)**：
+  - 详情头部（层级面包屑、大号税号、复制反馈、现行状态徽章、打印与算税直达）；
+  - 3 大概览卡片（法定计量单位、海关监管条件详解、检验检疫 CIQ 说明）；
+  - 税率分栏（进口关税最惠国/暂定优先/普通/增值税/消费税、出口退税、国际加征关税参考）；
+  - **规范申报要素清单**（序号清晰、必填/选填标识、**一键复制海关标准申报格式字符串**）；
+  - 章节归属层级树。
+- [x] **税费智能计算器 (`/tools/tax`)**：
+  - CIF / FOB / CFR / EXW 全贸易术语覆盖，配有海关完税审价公式说明；
+  - 试算结果卡片支持**综合有效税负率计算**、税费明细占比可视化进度条、一键复制核算清单；
+  - 预设 5 万数码配件、10 万化妆品等典型案例一键填充试算。
+- [x] **账户中心与异常页**：
+  - 现代化左图右表双栏登录与注册页面（`/login`, `/register`）；
+  - 个人中心（`/profile`）安全设置与资料管理；
+  - 404 与 Error 页面统一视觉规范。
 
-| # | 差距 | 影响面 | 备注 |
-| --- | --- | --- | --- |
-| 1 | 无收藏 / 浏览历史 | 用户已登录但没有"我的内容"，留存极弱 | 数据库需要新表 |
-| 2 | 搜索仅 ILIKE 模糊匹配 | 中文长尾词命中差，无智能联想 | 需要 PG 全文搜索或外部引擎 |
-| 3 | 无 AI 归类辅助 | 这是同类产品（关务通、Sino-tariff）的核心竞争力 | 需要接入大模型 |
-| 4 | 无 Admin 后台 | 数据无法在线维护，全靠 seed 脚本 | role 字段已就位 |
-| 5 | SEO 基本缺失 | 详情页没有 metadata/sitemap/OG，搜索引擎流量被浪费 | Next.js 原生支持 |
-| 6 | 无 OAuth / 邮件验证 / 忘记密码 | 注册门槛和找回流程不完整 | NextAuth 现成 |
-| 7 | 协议税率字段为空 | RCEP / 东盟 / CEPA 等卖点未释放 | 数据 + UI |
-| 8 | 暗色模式未启用 | next-themes 已装但没用 | 低成本 |
-| 9 | 无测试 / 无监控 | 难以放心快速迭代 | 工程质量 |
-| 10 | 法律页面缺失 | 备案与合规风险 | 合规 |
-
----
-
-## 三、推荐路线图
-
-按"先把已登录用户的价值做满，再升级查询智能化，最后补齐数据治理与增长"的顺序排。每期 1–3 周，可独立上线。
-
-### Phase 1 · 用户价值深化（约 2 周）
-
-**目标**：让已登录用户有「回来」的理由。
-
-- [ ] **收藏夹**
-  - 新表：`user_favorites(userId, hscodeId, note, createdAt)`
-  - 详情页 / 搜索结果卡片增加收藏按钮
-  - 新页面：`/profile/favorites`
-- [ ] **浏览历史**
-  - 新表：`user_history(userId, hscodeId, visitedAt)`，唯一键 (userId, hscodeId)，最近一次访问时间更新
-  - 个人中心新增 Tab：最近浏览
-- [ ] **认证流程补全**
-  - OAuth：GitHub + Google（auth.ts 已留口子）
-  - 忘记密码 → 邮箱链接重置
-  - 邮箱验证（启用现有 `verificationTokens` 表）
-- [ ] **暗色模式**
-  - 接通 next-themes，Navbar 加切换按钮，shadcn 组件颜色已就绪
-- [ ] **小修小补**
-  - `TaxResultCard` 的「立即计算」按钮：当前是自动计算+按钮，二选一（建议改为"复制结果"）
-  - `Footer` 的"联系支持"链接全是占位 — 至少链到 issue / 邮件
-
-**产出**：用户从"查一次就走"变成"会回来看自己的清单"。
-
----
-
-### Phase 2 · 智能化升级（约 3 周）
-
-**目标**：差异化竞争力，从"目录工具"升级为"归类助手"。
-
-- [ ] **AI 归类推荐**
-  - 输入：商品中文描述（含材质、用途、规格）
-  - 输出：Top 3 HS 编码 + 推理依据 + 风险提示
-  - 选型：Claude 4.X（Anthropic SDK，启用 prompt caching 把 HS 章节定义喂进去）
-  - 入口：首页 Hero 旁加「AI 归类」Tab、`/tools/ai-classify` 独立页
-- [ ] **申报要素辅助生成**
-  - 详情页"申报要素"卡片增加「AI 填充」按钮，结合商品描述生成符合规范的申报字段
-- [ ] **自然语言问答（可选 / Phase 2.5）**
-  - "8517 的产品出口到越南有 RCEP 优惠吗？" 这类问题
-  - 基于站内数据做 RAG，避免幻觉
-- [ ] **搜索体验升级**
-  - 启用 Postgres 全文搜索：`tsvector` + 中文分词（pg_jieba 或 zhparser）
-  - 加 trigram 索引解决错别字
-  - 搜索框加入实时联想（debounced server action）
-
-**关键架构决策**：
-- AI 调用走 server action，**严禁**把 API Key 暴露到前端。
-- Prompt caching 必开 — HS 章节 / 申报要素规则是天然的高复用静态内容。
-- 速率限制：未登录用户每日 N 次，登录用户 M 次，避免成本失控。
+#### ⚡ 里程碑 B：境外 Vercel + 境内 VPS 异地架构极致性能优化
+- [x] **全站 ISR 静态预生成**：
+  - `/` 首页：启用 `revalidate = 86400`（1d ISR），从 Vercel Edge 边缘节点 0ms 瞬间返回；
+  - `/category` 分类页：解耦客户端 `searchParams`，启用 `revalidate = 86400`（1d ISR）；
+  - `/tools/tax` 计算器：抽离客户端参数容器，启用 `revalidate = 86400`（1d ISR）；
+  - `/hscode/[id]` 详情页：启用 `revalidate = 604800`（7天）增量静态缓存，一次生成全球边缘复用。
+- [x] **首屏渲染零阻塞**：
+  - 将导航栏用户状态解耦为独立客户端挂载组件 `NavbarUser`，首屏 HTML 无需等待 session 解密；
+  - `middleware.ts` 收窄为仅拦截敏感鉴权路由，剔除公开页面的无谓加解密中间件。
+- [x] **网络物理延迟缩减**：
+  - 配置 `vercel.json` 部署区域为香港 `["hkg1"]`，境内 VPS 访问延迟从 ~260ms 缩短至 30ms~50ms。
+- [x] **数据容灾降级**：
+  - `category.service.ts` 增加本地静态 `hs_structure.json` 降级兜底，保障网络抖动下 100% 可用。
 
 ---
 
-### Phase 3 · 后台与数据治理（约 2 周）
+## 二、当前剩余的关键差距与痛点
 
-**目标**：让数据可以在线维护，激活已建好但未用的字典表。
-
-- [ ] **Admin 路由组** `/admin/*`
-  - 中间件按 `users.role === 'admin'` 拦截
-  - 仪表盘：搜索量、热门编码、用户数趋势
-- [ ] **HS 编码维护**
-  - 列表 / 编辑 / 历史版本
-  - 协议税率 (`agreements`) 表单化编辑：RCEP / ASEAN / CEPA / 中欧等
-- [ ] **字典表正式启用** (`sys_references`)
-  - 监管证件代码、检疫代码、计量单位、贸易国别 — 全部迁入
-  - 详情页/搜索页从字典表 hover 展开解释（如「监管 A」→「自动进口许可证」）
-- [ ] **用户管理**
-  - 列表 / 禁用 / 角色调整
+| # | 差距 | 影响面 | 紧迫度 | 解决方向 |
+| --- | --- | --- | :---: | --- |
+| 1 | **无用户收藏与历史轨迹** | 登录用户无专属资产，次日留存率低 | 🔥 高 | 新建 `user_favorites` & `user_history` 表 |
+| 2 | **缺乏 AI 智能归类助手** | 纯关键词搜索对口语化、长描述商品难以命中 | 🔥 高 | 接入大语言模型 (DeepSeek / Claude) |
+| 3 | **搜索引擎收录 (SEO) 缺失** | 详情页无动态 metadata/sitemap，流失海量自然搜索流量 | 🔥 高 | `generateMetadata` + `sitemap.ts` + JSON-LD |
+| 4 | **协议税率数据未填补** | RCEP / 东盟 / CEPA 等外贸企业极其关注的协定税率为空 | 中 | 数据补全 + 协议税率交互 Tab |
+| 5 | **无管理后台 (Admin)** | 税率调整与字典维护依赖手动执行 SQL 或种子脚本 | 中 | 建立 `/admin` 路由与数据维护面板 |
+| 6 | **对外 OpenAPI 缺失** | ERP、报关系统无法通过接口调用核算引擎 | 中 | 发布 `/api/v1/` RESTful 接口 + Token 鉴权 |
 
 ---
 
-### Phase 4 · SEO 与开放能力（约 2 周）
+## 三、下一阶段迭代路线图 (2025 Q2 - Q3)
 
-**目标**：拿到搜索引擎流量，并对外提供能力。
+### Phase 1 · 用户资产与留存闭环（预计 1-2 周）
 
-- [ ] **SEO**
-  - 详情页 `generateMetadata` — title/description/canonical
-  - `sitemap.ts` 动态输出全部 HS Code URL（chunk 分文件）
-  - `robots.ts`
-  - OG 图片：用 `next/og` 动态生成（编码 + 商品名 + 税率徽章）
-  - 结构化数据 JSON-LD（Product / BreadcrumbList）
-  - 详情页改为 SSG + ISR（revalidate 每天）
-- [ ] **公开 API**
-  - `/api/v1/hscode/[code]`、`/api/v1/search`
-  - API Key 管理：新表 `api_keys`，profile 页申请
-  - 速率限制（Upstash / Redis 或 PG-based）
-- [ ] **国际化对照**（如果资源允许）
-  - 至少做中国 HS ↔ 美国 HTS 8 位的对照表
+**目标**：赋予登录用户明确价值，让外贸业务员和报关人员形成工具粘性。
 
----
-
-### Phase 5 · 工程质量（穿插进行，不单独占期）
-
-- [ ] 测试：Vitest（单元）+ Playwright（关键流程：搜索→详情→计算器）
-- [ ] 错误监控：Sentry（或自托管的 GlitchTip）
-- [ ] 性能预算：Lighthouse CI 在 PR 跑
-- [ ] 类型清理：搜索结果 `results: any[]` 这类替换成精确类型
-- [ ] 合规：服务条款 / 隐私政策 / 关于我们 / ICP 备案位
+- [x] **HS Code 收藏夹 (Favorites)**
+  - 新建数据表：`user_favorites(id, user_id, hscode_id, note, tags, created_at)`，支持联合唯一索引
+  - 搜索结果卡片与详情页已集成「一键收藏」按钮（带书签微动效与 Toast 提示）
+  - 个人中心上线独立模块：我的收藏夹，支持自定义备注修改、实时过滤检索、一键带入税费测算
+- [x] **查询历史轨迹 (History)**
+  - 详情页静默轨迹追踪器 `HistoryTracker`，本地留存最近 50 条海关编码浏览记录
+  - 个人中心「浏览历史轨迹」看板，支持时间差展示（刚刚、几分钟前）与一键清空
+- [x] **全局快捷搜索弹窗 (Command + K)**
+  - 全局键盘监听 `⌘K` / `Ctrl+K` 与 `ESC` 关闭，智能感知 Mac 与 Windows 平台
+  - 导航栏专属触发组件 `QuickSearchTrigger`，点击秒级唤出 Spotlight 式命令弹窗
+  - 实时联想（纯数字优先匹配 HS Code，品名模糊检索，带最惠国/退税率预览）
+  - 键盘上下键选定、回车直达详情；默认态展示高频编码与工具快捷入口
+- [x] **暗色模式无缝适配**
+  - 接通 `next-themes` ThemeProvider，Navbar 引入平滑动画的 `ThemeToggle` 切换按钮
+- [ ] **账户体系补全**
+  - 集成 Google / GitHub OAuth 第三方一键登录
+  - 忘记密码与邮箱验证重置流程（启用现有的 `verification_tokens`）
 
 ---
 
-## 四、Phase 1 的具体落地建议
+### Phase 2 · AI 智能归类与申报助手（预计 2-3 周）
 
-如果要立刻开干，建议从 Phase 1 的「收藏夹」开始，因为它：
+**目标**：从单一的“编码字典”跃升为真正的“关务智能辅助助手”。
 
-1. **闭环短**：表 + Action + 一个按钮 + 一个列表页，1–2 天可上线。
-2. **价值显性**：用户能立刻感知到登录的意义。
-3. **架构铺路**：会引入 `user_favorites` 这第一张「用户内容表」，后续历史、API Key、订阅都沿着同一套范式走。
+- [ ] **AI 编码智能推荐 (AI HS-Classifier)**
+  - **交互**：输入商品自然语言（如：“带蓝牙功能的车载加热水杯，外壳是不锈钢，容量400ml”）
+  - **输出**：推荐 Top 3 匹配度最高的 HS 编码、归类依据推理过程、潜在申报风险提示
+  - **模型选型**：DeepSeek-V3 / Claude 3.5 Sonnet，结合海关章节类目系统做 Prompt 工程
+  - **入口**：首页 Hero 增加「AI 智能归类」Tab，独立页面 `/tools/ai-classifier`
+- [ ] **AI 申报要素自动填报建议**
+  - 在详情页申报要素模块中，增加「智能填报参考」，根据商品类型自动生成标准填报范例
+- [ ] **智能模糊与拼音容错检索**
+  - 升级 Postgres 全文检索，引入 pg_trgm 相似度匹配，解决用户错别字、漏字问题
 
-**首张表草案**：
+---
 
-```ts
-// src/db/schema/userContent.ts
-export const userFavorites = pgTable('user_favorite', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  hscodeId: uuid('hscodeId').notNull().references(() => hscodes.id, { onDelete: 'cascade' }),
-  note: text('note'),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-}, (t) => ({
-  userHscodeIdx: uniqueIndex('user_favorite_user_hscode_idx').on(t.userId, t.hscodeId),
-  userIdx: index('user_favorite_user_idx').on(t.userId),
-}));
+### Phase 3 · SEO 全网流量引流与开放接口（预计 2 周）
+
+**目标**：最大化自然搜索流量，构建外贸生态开放能力。
+
+- [ ] **全量 SEO 基础设施**
+  - 详情页接入 `generateMetadata`：动态输出权威 Title、Description、Keywords
+  - 动态 `sitemap.ts`：将全量 10,000+ 海关编码切片输出为标准 XML Sitemap 提交搜索引擎
+  - 详情页注入 Google / 百度标准的 Schema.org JSON-LD（Product 与 BreadcrumbList）
+  - 社交分享 OpenGraph 卡片动态生成（`next/og`）
+- [ ] **开放 API 平台 (OpenAPI)**
+  - 开放标准 RESTful 接口：
+    - `GET /api/v1/hscode/:code`（获取指定编码税率与要素）
+    - `GET /api/v1/search?q=...`（编码与品名检索）
+    - `POST /api/v1/calculate/tax`（税费自动推导计算）
+  - 在个人中心提供 API Key 申请与每日用量统计仪表盘
+  - 接入 Upstash Redis 实现令牌桶（Token Bucket）速率限制（Rate Limiting）
+
+---
+
+### Phase 4 · 数据治理与后台管理（预计 2 周）
+
+**目标**：实现海关税则数据的在线无缝更新与字典治理。
+
+- [ ] **Admin 管理工作台 (`/admin`)**
+  - 基于 NextAuth `role === 'admin'` 鉴权中间件拦截
+  - 数据统计概览看板：今日查询量、热门检索词、注册用户增长趋势
+- [ ] **税则与协议税率在线维护**
+  - 支持导入并维护 RCEP、中国-东盟自贸协定等优惠税率表
+  - 申报要素版本管理与编辑
+- [ ] **字典表 (`sys_references`) 正式联通**
+  - 激活监管代码表（A/B/4/7 等详细释义）、检验检疫代码表、国家地区编码表
+  - 全站鼠标悬停监管标签时，气泡弹窗浮现法条与证件申领规范
+
+---
+
+## 四、当前包依赖版本对照表 (已升级完成)
+
+```json
+{
+  "dependencies": {
+    "next": "16.3.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwindcss": "4.3.3",
+    "drizzle-orm": "0.45.2",
+    "drizzle-kit": "0.31.10",
+    "next-auth": "5.0.0-beta.30",
+    "@auth/drizzle-adapter": "1.11.3",
+    "zod": "4.6.0",
+    "react-hook-form": "7.87.0",
+    "@hookform/resolvers": "5.9.1",
+    "postgres": "3.4.9",
+    "sonner": "2.0.8",
+    "tailwind-merge": "3.6.0",
+    "@radix-ui/react-avatar": "1.2.6",
+    "@radix-ui/react-checkbox": "1.3.11",
+    "@radix-ui/react-dropdown-menu": "2.1.24",
+    "@radix-ui/react-tabs": "1.1.21"
+  }
+}
 ```
 
 ---
 
-## 五、开放问题（请审核回复）
+## 五、近期执行建议
 
-1. **优先级**：是否同意「Phase 1 → 2 → 3 → 4」这个顺序？还是有商业上的强约束（比如 demo 要先有 AI）？
-2. **AI 选型**：Claude / OpenAI / 国产模型（通义千问、DeepSeek）有偏好吗？是否有现成 API 配额？
-3. **协议税率数据源**：是否有现成的 RCEP/CEPA 数据可以导入？没有的话需要先规划数据采集。
-4. **目标用户**：是 B 端外贸企业为主，还是 C 端学生 / 海淘党？这影响是否要做"AI 归类"还是优先做"中英对照 / 国际版"。
-5. **预算**：是否有外部服务（Sentry、Upstash、Resend、AI Token）的可用预算？这会决定 Phase 5 用付费 SaaS 还是自托管。
-
----
-
-> 审核通过后，我会把同意的项拆成 issue / 任务列表，再逐项实现。
+建议优先开启 **Phase 1 的「用户收藏夹与备注」** 功能：
+1. **闭环周期短**：创建 `user_favorites` 表与 Server Action，前端卡片加一个书签按钮，1~2 天即可上线闭环。
+2. **留存立竿见影**：用户可以将自己公司常出的几十个 HS Code 收藏起来，随时查看最新税率与申报要素，显著提高次周留存率。

@@ -6,7 +6,6 @@ import {
   ClipboardCheck, 
   ShieldAlert, 
   ArrowRight,
-  TrendingUp,
   Database,
   Building2,
   Clock
@@ -20,32 +19,32 @@ export default function Stats() {
       label: "海关商品细分税目",
       desc: "涵盖 8 位与 10 位法定编码全量数据",
       icon: Database,
-      color: "text-blue-600",
-      bg: "bg-blue-50"
+      color: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-50 dark:bg-blue-500/10"
     },
     {
       value: "98 章",
       label: "WCO 标准分类体系",
       desc: "从农副产品到高新精密仪器完整覆盖",
       icon: Building2,
-      color: "text-indigo-600",
-      bg: "bg-indigo-50"
+      color: "text-indigo-600 dark:text-indigo-400",
+      bg: "bg-indigo-50 dark:bg-indigo-500/10"
     },
     {
       value: "4 种",
       label: "Incoterms 贸易条款推导",
       desc: "支持 CIF / FOB / CFR / EXW 完税价格倒推",
       icon: Calculator,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50"
+      color: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-50 dark:bg-emerald-500/10"
     },
     {
       value: "2025",
       label: "最新执行关税口径",
       desc: "及时对标暂定税率、协定税率与监管证件",
       icon: Clock,
-      color: "text-amber-600",
-      bg: "bg-amber-50"
+      color: "text-amber-600 dark:text-amber-400",
+      bg: "bg-amber-50 dark:bg-amber-500/10"
     }
   ];
 
@@ -81,14 +80,14 @@ export default function Stats() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-white dark:bg-[#080c14] transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
         
         {/* 数据背书指标 */}
         <div>
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">权威数据背书</h2>
-            <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">权威数据背书</h2>
+            <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               数万外贸人的合规通关首选助手
             </p>
           </div>
@@ -99,18 +98,18 @@ export default function Stats() {
               return (
                 <div 
                   key={i} 
-                  className="p-6 rounded-2xl bg-slate-50/70 border border-slate-100 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all group"
+                  className="p-6 rounded-2xl bg-slate-50/70 dark:bg-[#0f172a] border border-slate-100 dark:border-white/[0.08] hover:border-blue-200 dark:hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 group-hover:text-blue-600 transition-colors">
+                    <span className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {stat.value}
                     </span>
                     <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${stat.color}`} />
                     </div>
                   </div>
-                  <h4 className="text-sm font-bold text-slate-800 mb-1">{stat.label}</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">{stat.desc}</p>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">{stat.label}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{stat.desc}</p>
                 </div>
               );
             })}
@@ -118,10 +117,10 @@ export default function Stats() {
         </div>
 
         {/* 核心产品功能板块 */}
-        <div className="pt-8 border-t border-slate-100">
+        <div className="pt-8 border-t border-slate-100 dark:border-white/[0.08]">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2 block">核心功能服务</span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2 block">核心功能服务</span>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               打通海关编码到外贸清关的每一个关键环节
             </h3>
           </div>
@@ -132,31 +131,31 @@ export default function Stats() {
               return (
                 <div 
                   key={idx} 
-                  className="group relative bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl hover:shadow-slate-200/50 hover:border-blue-300 transition-all duration-300 flex flex-col justify-between"
+                  className="group relative bg-white dark:bg-[#0f172a] p-6 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] shadow-2xs hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-black/60 hover:border-blue-300 dark:hover:border-blue-500/50 transition-all duration-300 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-blue-50 group-hover:bg-blue-600 text-blue-600 group-hover:text-white transition-colors duration-300 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 group-hover:bg-blue-600 dark:group-hover:bg-blue-500 text-blue-600 dark:text-blue-400 group-hover:text-white transition-colors duration-300 flex items-center justify-center">
                         <Icon className="w-6 h-6" />
                       </div>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-700 transition-colors">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-blue-500/20 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
                         {feat.badge}
                       </span>
                     </div>
 
-                    <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                    <h4 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
                       {feat.title}
                     </h4>
 
-                    <p className="text-xs text-slate-500 leading-relaxed">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                       {feat.desc}
                     </p>
                   </div>
 
-                  <div className="pt-5 mt-4 border-t border-slate-100">
+                  <div className="pt-5 mt-4 border-t border-slate-100 dark:border-white/[0.06]">
                     <Link 
                       href={feat.link} 
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                     >
                       立即体验
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -169,7 +168,7 @@ export default function Stats() {
         </div>
 
         {/* 底部行动召唤 (CTA) */}
-        <div className="rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-8 sm:p-12 text-white shadow-xl shadow-blue-600/15 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+        <div className="rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 dark:from-blue-900 dark:via-blue-800 dark:to-indigo-900 p-8 sm:p-12 text-white shadow-xl shadow-blue-600/15 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
           <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-[radial-gradient(circle_at_100%_50%,rgba(255,255,255,0.15),transparent_70%)] pointer-events-none" />
           
           <div className="space-y-2 text-center md:text-left z-10">
@@ -182,12 +181,12 @@ export default function Stats() {
           </div>
 
           <div className="flex items-center gap-3 z-10 shrink-0">
-            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 font-bold rounded-xl shadow-md" asChild>
+            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 font-bold rounded-xl shadow-md cursor-pointer" asChild>
               <Link href="/search">
                 立即搜索编码
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl" asChild>
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl cursor-pointer" asChild>
               <Link href="/tools/tax">
                 试算税费
               </Link>

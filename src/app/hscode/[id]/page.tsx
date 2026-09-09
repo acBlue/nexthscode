@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import DetailHeader from '@/components/hscode/DetailHeader';
 import TaxInfoCard from '@/components/hscode/TaxInfoCard';
 import DeclarationElements from '@/components/hscode/DeclarationElements';
+import HistoryTracker from '@/components/hscode/HistoryTracker';
 import { getHsCodeDetail } from '@/services/hscode.service';
 import { 
   ArrowDownCircle, 
@@ -13,16 +14,17 @@ import {
   ShieldCheck, 
   Scale, 
   Microscope, 
-  Layers,
-  FileSpreadsheet,
-  AlertTriangle,
-  ChevronRight
+  Layers
 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 
 interface DetailPageProps {
   params: Promise<{ id: string }>;
 }
+
+// 启用 ISR：海关编码详情页在 Vercel 边缘缓存 7 天 (604800 秒)
+export const revalidate = 604800;
+export const dynamicParams = true;
 
 export default async function DetailPage({ params }: DetailPageProps) {
   const { id } = await params;
@@ -33,10 +35,18 @@ export default async function DetailPage({ params }: DetailPageProps) {
   const formatRate = (val: string | null) => val ? `${val}` : '-';
 
   return (
-    <div className="min-h-screen bg-slate-50/60 font-sans text-slate-900 pb-20 selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50/60 dark:bg-[#080c14] font-sans text-slate-900 dark:text-slate-100 pb-20 selection:bg-blue-600 selection:text-white transition-colors duration-200">
       <Navbar />
 
+      <HistoryTracker
+        id={data.id}
+        code={data.code}
+        cleanCode={data.cleanCode}
+        name={data.name}
+      />
+
       <DetailHeader
+        hscodeId={data.id}
         hscode={data.code}
         name={data.name}
         nameEn={""}
@@ -52,60 +62,60 @@ export default async function DetailPage({ params }: DetailPageProps) {
         {/* 顶部：3 大核心概览卡片 */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           {/* 1. 计量单位 */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs flex items-center gap-4 relative overflow-hidden group hover:border-blue-300 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+          <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-5 border border-slate-200/90 dark:border-white/[0.08] shadow-2xs flex items-center gap-4 relative overflow-hidden group hover:border-blue-300 dark:hover:border-blue-500/50 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <Scale className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">法定计量单位</p>
-              <p className="text-xl font-extrabold text-slate-900 font-mono truncate">
+              <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-0.5">法定计量单位</p>
+              <p className="text-xl font-extrabold text-slate-900 dark:text-white font-mono truncate">
                 {data.unit1 || '-'}{data.unit2 ? ` / ${data.unit2}` : ''}
               </p>
-              <p className="text-[11px] text-slate-400 mt-0.5">第一法定单位 / 第二单位</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">第一法定单位 / 第二单位</p>
             </div>
           </div>
 
           {/* 2. 海关监管 */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs flex items-center gap-4 relative overflow-hidden group hover:border-amber-300 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+          <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-5 border border-slate-200/90 dark:border-white/[0.08] shadow-2xs flex items-center gap-4 relative overflow-hidden group hover:border-amber-300 dark:hover:border-amber-500/50 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">海关监管条件</p>
+              <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-0.5">海关监管条件</p>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-extrabold text-slate-900 font-mono">
+                <span className="text-xl font-extrabold text-slate-900 dark:text-white font-mono">
                   {data.regulatoryCode || '无'}
                 </span>
                 {data.regulatoryCode && (
-                  <Badge className="text-[10px] bg-amber-50 text-amber-800 border-amber-200 font-semibold">
+                  <Badge className="text-[10px] bg-amber-50 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-500/30 font-semibold">
                     需监管证件
                   </Badge>
                 )}
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">
                 {data.regulatoryCode ? "需按指定代码提供相应进出口许可证件" : "无需提供特殊海关进出口许可证"}
               </p>
             </div>
           </div>
 
           {/* 3. 检验检疫 */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs flex items-center gap-4 relative overflow-hidden group hover:border-emerald-300 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-5 border border-slate-200/90 dark:border-white/[0.08] shadow-2xs flex items-center gap-4 relative overflow-hidden group hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <Microscope className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">检验检疫类别 (CIQ)</p>
+              <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-0.5">检验检疫类别 (CIQ)</p>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-extrabold text-slate-900 font-mono">
+                <span className="text-xl font-extrabold text-slate-900 dark:text-white font-mono">
                   {data.quarantineCode || '无'}
                 </span>
                 {data.quarantineCode && (
-                  <Badge className="text-[10px] bg-emerald-50 text-emerald-800 border-emerald-200 font-semibold">
+                  <Badge className="text-[10px] bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30 font-semibold">
                     商检申报
                   </Badge>
                 )}
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">
                 {data.quarantineCode ? "通关时须实施出入境动植食检或卫检" : "通常无出入境强制商检要求"}
               </p>
             </div>
@@ -151,35 +161,35 @@ export default async function DetailPage({ params }: DetailPageProps) {
           <div className="lg:col-span-8 space-y-6">
             
             {/* 章节归属卡片 */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <Layers className="w-4 h-4 text-blue-600" />
-                <h3 className="text-sm font-bold text-slate-800">章节归属层级体系</h3>
+            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/90 dark:border-white/[0.08] p-5 shadow-2xs space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-white/[0.06]">
+                <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">章节归属层级体系</h3>
               </div>
 
               <div className="space-y-3">
                 {/* Section */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50/70 border border-slate-100">
-                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600 shrink-0">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-100 dark:border-white/[0.06]">
+                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-300 shrink-0">
                     第 {data.chapter.section.code} 类
                   </span>
-                  <div className="text-xs text-slate-600 leading-relaxed">
+                  <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                     {data.chapter.section.name}
                   </div>
                 </div>
 
                 {/* Chapter */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50/60 border border-blue-100">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50/60 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
                   <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-blue-600 text-white shrink-0 shadow-2xs">
                     第 {data.chapter.code} 章
                   </span>
-                  <div className="text-xs font-medium text-blue-950 leading-relaxed">
+                  <div className="text-xs font-medium text-blue-950 dark:text-blue-200 leading-relaxed">
                     {data.chapter.name}
                   </div>
                 </div>
 
                 {data.description && (
-                  <div className="p-3 bg-amber-50/60 rounded-xl text-xs text-amber-800 border border-amber-200/60">
+                  <div className="p-3 bg-amber-50/60 dark:bg-amber-500/10 rounded-xl text-xs text-amber-800 dark:text-amber-300 border border-amber-200/60 dark:border-amber-500/20">
                     <span className="font-bold mr-1">品目附注:</span>
                     {data.description}
                   </div>

@@ -1,14 +1,14 @@
 import React from "react";
 import Link from "next/link";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { ShieldCheck, CheckCircle2, TrendingUp, Sparkles } from "lucide-react";
+import { ShieldCheck, CheckCircle2, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen flex flex-col lg:flex-row bg-white selection:bg-blue-600 selection:text-white">
+        <div className="min-h-screen flex flex-col lg:flex-row bg-white dark:bg-[#080c14] selection:bg-blue-600 selection:text-white transition-colors duration-200">
             
             {/* 左侧：品牌展示区 (桌面端显示) */}
-            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 p-12 flex-col justify-between relative overflow-hidden text-white">
+            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 p-12 flex-col justify-between relative overflow-hidden text-white border-r border-white/[0.06]">
                 <div className="absolute inset-0 bg-grid-slate opacity-20 pointer-events-none" />
                 <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
 
@@ -60,7 +60,7 @@ export default function LoginPage() {
             </div>
 
             {/* 右侧：登录表单卡片区 */}
-            <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-slate-50/50">
+            <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-slate-50/50 dark:bg-[#080c14]">
                 <div className="w-full max-w-md">
                     <LoginForm />
                 </div>
