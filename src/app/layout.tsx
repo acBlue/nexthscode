@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "海关编码查询",
-  description: "海关编码查询服务",
+  title: "HS Code 海关编码与税率智能查询服务",
+  description: "提供一站式海关编码(HS Code)查询、进出口关税增值税核算、申报要素及外贸监管条件合规检索。",
 };
 
 export default function RootLayout({
@@ -24,13 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="zh-CN" className="scroll-smooth">
+      <body className="font-sans antialiased bg-background text-foreground min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
         {children}
-        <Toaster />
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );
 }
+

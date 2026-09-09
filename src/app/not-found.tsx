@@ -1,38 +1,50 @@
-// app/not-found.tsx
-import Link from 'next/link'
+import Link from 'next/link';
+import { ShieldAlert, Home, Search, Compass } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function NotFound() {
     return (
-        <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-50 px-4">
-            <div className="text-center">
-                {/* 这里的 SVG 可以替换成插图 */}
-                <h1 className="text-9xl font-black text-gray-200">404</h1>
+        <div className="min-h-screen w-full flex flex-col items-center justify-center bg-slate-50/70 px-4 relative overflow-hidden selection:bg-blue-600 selection:text-white">
+            <div className="absolute inset-0 bg-grid-slate opacity-40 pointer-events-none" />
+            <div className="w-96 h-96 bg-blue-500/10 rounded-full blur-3xl absolute pointer-events-none" />
 
-                <p className="text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                    页面未找到
-                </p>
+            <div className="relative z-10 max-w-md w-full bg-white rounded-3xl border border-slate-200/90 p-8 sm:p-10 shadow-xl shadow-slate-200/50 text-center space-y-6">
+                
+                <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-xs">
+                    <ShieldAlert className="w-8 h-8" />
+                </div>
 
-                <p className="mt-4 text-gray-500">
-                    抱歉，我们找不到您要查找的页面。它可能已被移动或删除。
-                </p>
+                <div className="space-y-2">
+                    <span className="text-xs font-mono font-bold text-blue-600 tracking-widest uppercase">
+                        Error 404
+                    </span>
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        找不到该页面或税目
+                    </h1>
+                    <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                        抱歉，您访问的页面地址不存在，或者目标商品编码已调整。请检查输入的税号是否正确。
+                    </p>
+                </div>
 
-                <div className="mt-6">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                    >
-                        返回首页
-                    </Link>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                    <Button className="w-full sm:w-auto rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs" asChild>
+                        <Link href="/">
+                            <Home className="w-4 h-4 mr-1.5" />
+                            返回首页
+                        </Link>
+                    </Button>
+                    <Button variant="outline" className="w-full sm:w-auto rounded-xl border-slate-200" asChild>
+                        <Link href="/search">
+                            <Search className="w-4 h-4 mr-1.5" />
+                            去查编码
+                        </Link>
+                    </Button>
+                </div>
 
-                    {/* 如果是 HS Code 网站，这里可以加一个搜索框 */}
-                    <Link
-                        href="/search"
-                        className="ml-4 inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    >
-                        去搜索
-                    </Link>
+                <div className="pt-4 border-t border-slate-100 text-[11px] text-slate-400">
+                    HSCode Master 海关编码智能检索平台
                 </div>
             </div>
         </div>
-    )
+    );
 }

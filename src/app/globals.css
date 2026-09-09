@@ -6,8 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -44,72 +44,67 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
+  --radius: 0.75rem;
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e293b;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #3b82f6;
+  --chart-1: #2563eb;
+  --chart-2: #0284c7;
+  --chart-3: #0d9488;
+  --chart-4: #f59e0b;
+  --chart-5: #6366f1;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #3b82f6;
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.92 0.004 286.32);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
+  --background: #090d16;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --destructive: #ef4444;
+  --border: #1e293b;
+  --input: #334155;
+  --ring: #60a5fa;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #60a5fa;
 }
 
 @layer base {
@@ -121,78 +116,60 @@
   }
 }
 
+/* 优雅平滑的自定义滚动条 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
 
-/* app/globals.css */
+/* 背景纹理与氛围光 */
+.bg-grid-slate {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-radial-gradient-hero {
+  background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.12) 0%, rgba(99, 102, 241, 0.05) 35%, transparent 70%);
+}
 
 @media print {
-  /* 1. 隐藏所有不必要的元素 */
-  nav,                /* 顶部导航栏 (Navbar) */
-  footer,             /* 底部 (Footer) */
-  button,             /* 所有的按钮 */
-  .no-print,          /* 自定义不想打印的类 */
-  [role="dialog"],    /* 弹窗 */
-  [data-radix-scroll-area-viewport] { /* 滚动条容器有时候会有问题，重置 */
-      overflow: visible !important; 
+  nav, footer, button, .no-print, [role="dialog"], [data-radix-scroll-area-viewport] {
+    overflow: visible !important;
   }
-
-  /* 2. 页面基础设置 */
   @page {
-    margin: 15mm; /* 设置纸张边距 */
+    margin: 15mm;
     size: auto;
   }
-
   body {
     background: white !important;
     color: black !important;
-    font-size: 12pt; /* 打印字体稍微小一点更精致 */
+    font-size: 12pt;
   }
-
-  /* 3. 强制展开所有内容 */
-  /* 防止卡片内部出现滚动条，导致打印内容不全 */
-  .scroll-area, 
-  .overflow-auto, 
-  .overflow-y-auto {
-      overflow: visible !important;
-      height: auto !important;
-      max-height: none !important;
+  .scroll-area, .overflow-auto, .overflow-y-auto {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
   }
-
-  /* 4. 样式重置：为了省墨和清晰 */
-  .bg-slate-50, 
-  .bg-gray-50, 
-  .bg-blue-50, 
-  .bg-amber-50,
-  .bg-background,
-  .bg-muted {
-      background-color: transparent !important; /* 去除背景色 */
+  .bg-slate-50, .bg-gray-50, .bg-blue-50, .bg-amber-50, .bg-background, .bg-muted {
+    background-color: transparent !important;
   }
-
-  /* 边框变成黑色线条 */
   .border, .border-b, .border-l-4 {
-      border-color: #000 !important;
+    border-color: #000 !important;
   }
-  
-  /* 确保文字颜色是黑色 */
-  .text-blue-600, .text-blue-700, 
-  .text-amber-600, .text-emerald-600,
-  .text-muted-foreground {
-      color: #000 !important;
+  .text-blue-600, .text-blue-700, .text-amber-600, .text-emerald-600, .text-muted-foreground {
+    color: #000 !important;
   }
-
-  /* 5. 布局控制 */
-  /* 避免卡片被从中间切断到下一页 */
   .break-inside-avoid {
-      break-inside: avoid;
+    break-inside: avoid;
   }
-  
-  /* 强制把 Grid 布局在打印时改为简单的流式布局或者保持 Grid 但调整间距 */
-  /* 如果你的两列布局在A4纸上太挤，可以强制改为单列，如下： */
-  /* .lg\:grid-cols-12 {
-      display: block !important;
-  } 
-  .lg\:col-span-4, .lg\:col-span-8 {
-      width: 100% !important;
-      margin-bottom: 20px;
-  }
-  */
 }

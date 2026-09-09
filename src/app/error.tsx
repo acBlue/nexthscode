@@ -1,47 +1,59 @@
-// app/error.tsx
-'use client' // 必须标记为客户端组件
+'use client';
 
-import { useEffect } from 'react'
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { AlertCircle, RotateCcw, Home } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Error({
-                                  error,
-                                  reset,
-                              }: {
-    error: Error & { digest?: string }
-    reset: () => void
+    error,
+    reset,
+}: {
+    error: Error & { digest?: string };
+    reset: () => void;
 }) {
     useEffect(() => {
-        // 可以在这里将错误日志发送给 Sentry 或其他监控服务
-        console.error('Page Error:', error)
-    }, [error])
+        console.error('Page Error:', error);
+    }, [error]);
 
     return (
-        <div className="flex h-[80vh] w-full flex-col items-center justify-center px-4">
-            <div className="rounded-lg bg-red-50 p-8 text-center shadow-sm">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                    <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                    </svg>
+        <div className="min-h-[80vh] w-full flex flex-col items-center justify-center px-4 py-12">
+            <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200/90 p-8 shadow-xl shadow-slate-200/50 text-center space-y-6">
+                
+                <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
+                    <AlertCircle className="w-7 h-7" />
                 </div>
 
-                <h2 className="mb-2 text-lg font-semibold text-gray-900">
-                    出了一点问题
-                </h2>
+                <div className="space-y-2">
+                    <h2 className="text-xl font-bold text-slate-900">
+                        系统处理遇到了异常
+                    </h2>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                        数据请求过程中断或服务端响应超时。您可以尝试重新加载或返回首页继续查询。
+                    </p>
+                </div>
 
-                <p className="mb-6 text-sm text-gray-600">
-                    服务器遇到了一些干扰。请尝试刷新页面。
-                </p>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                    <Button
+                        onClick={() => reset()}
+                        className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs h-9 shadow-xs"
+                    >
+                        <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                        重新尝试
+                    </Button>
+                    <Button
+                        variant="outline"
+                        className="rounded-xl border-slate-200 text-xs h-9"
+                        asChild
+                    >
+                        <Link href="/">
+                            <Home className="w-3.5 h-3.5 mr-1.5" />
+                            回到首页
+                        </Link>
+                    </Button>
+                </div>
 
-                <button
-                    onClick={
-                        // 尝试恢复：这将尝试重新渲染该 Segment
-                        () => reset()
-                    }
-                    className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-                >
-                    重试
-                </button>
             </div>
         </div>
-    )
+    );
 }
