@@ -4,6 +4,6 @@ import { authConfig } from "./auth/auth.config";
 export default NextAuth(authConfig).auth;
 
 export const config = {
-    // 匹配所有路径，但排除静态资源、图片等
-    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+    // 仅拦截需要鉴权或做登录跳转的路由，避免对首页、搜索、分类等公开页面产生中间件阻塞
+    matcher: ["/profile/:path*", "/login", "/register"],
 };

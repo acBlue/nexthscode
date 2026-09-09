@@ -5,9 +5,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface PaginationProps {
-    total: number;      // 总条数
-    pageSize: number;   // 每页显示多少
-    currentPage: number;// 当前页码
+    total: number;
+    pageSize: number;
+    currentPage: number;
 }
 
 export default function Pagination({ total, pageSize, currentPage }: PaginationProps) {
@@ -16,25 +16,19 @@ export default function Pagination({ total, pageSize, currentPage }: PaginationP
 
     const totalPages = Math.ceil(total / pageSize);
 
-    // 如果只有1页或没数据，不显示分页
     if (totalPages <= 1) return null;
 
-    // 处理页码跳转
     const handlePageChange = (page: number) => {
         if (page < 1 || page > totalPages) return;
 
-        // 保留现有的查询参数 (q, chapter 等)，只更新 page
         const params = new URLSearchParams(searchParams.toString());
         params.set('page', page.toString());
-
-        // 跳转
         router.push(`/search?${params.toString()}`);
     };
 
-    // 简单的页码生成逻辑 (显示当前页的前后页)
     const renderPageNumbers = () => {
         const pages = [];
-        const maxVisible = 5; // 最多显示几个数字按钮
+        const maxVisible = 5;
 
         let start = Math.max(1, currentPage - 2);
         let end = Math.min(totalPages, start + maxVisible - 1);
@@ -48,10 +42,10 @@ export default function Pagination({ total, pageSize, currentPage }: PaginationP
                 <button
                     key={i}
                     onClick={() => handlePageChange(i)}
-                    className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                    className={`w-9 h-9 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
                         currentPage === i
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                            ? 'bg-blue-600 text-white shadow-2xs'
+                            : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                 >
                     {i}
@@ -66,9 +60,10 @@ export default function Pagination({ total, pageSize, currentPage }: PaginationP
             <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                title="上一页"
             >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4" />
             </button>
 
             {renderPageNumbers()}
@@ -76,9 +71,10 @@ export default function Pagination({ total, pageSize, currentPage }: PaginationP
             <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                title="下一页"
             >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4" />
             </button>
         </div>
     );

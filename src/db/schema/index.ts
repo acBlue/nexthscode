@@ -3,4 +3,4 @@
 export * from './system';
 export * from './hscode';
 export * from './account';
-
+export * from './userContent';

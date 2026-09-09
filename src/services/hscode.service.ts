@@ -128,3 +128,34 @@ export const getHsCodeDetail = unstable_cache(
     ['hscode-detail-v3'],
     { revalidate: 604800 }
 );
+
+// 快速联想检索 (用于 Command+K 快捷弹窗)
+export async function quickSearchHsCodes(query: string, limit = 8) {
+    const clean = query?.trim() || "";
+    if (!clean) return [];
+
+    try {
+        const results = await db.query.hscodes.findMany({
+            where: or(
+                ilike(hscodes.code, `%${clean}%`),
+                ilike(hscodes.cleanCode, `%${clean}%`),
+                ilike(hscodes.name, `%${clean}%`)
+            ),
+            columns: {
+                id: true,
+                code: true,
+                cleanCode: true,
+                name: true,
+                mfnRate: true,
+                vatRate: true,
+                exportRebateRate: true,
+            },
+            orderBy: [asc(hscodes.code)],
+            limit,
+        });
+        return results;
+    } catch (error) {
+        console.error("quickSearchHsCodes error:", error);
+        return [];
+    }
+}
