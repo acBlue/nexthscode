@@ -33,6 +33,7 @@ export const settings = async (values: z.infer<typeof ProfileSchema>) => {
     await db.update(users)
       .set({
         name: name,
+        updatedAt: new Date(),
         // email: email, // 如果未来允许改邮箱，在这里加
       })
       .where(eq(users.id, user.id));
@@ -87,6 +88,7 @@ export const newPassword = async (values: z.infer<typeof PasswordSchema>) => {
     await db.update(users)
       .set({
         password: hashedPassword,
+        updatedAt: new Date(),
       })
       .where(eq(users.id, user.id));
 

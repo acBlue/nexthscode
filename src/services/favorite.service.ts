@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { userFavorites, hscodes } from "@/db/schema";
+import { userFavorites } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 
 export interface FavoriteItem {
@@ -8,6 +8,7 @@ export interface FavoriteItem {
   note: string | null;
   tags: string | null;
   createdAt: Date;
+  updatedAt: Date;
   hscode: {
     id: string;
     code: string;
@@ -73,7 +74,7 @@ export async function isHscodeFavorited(userId: string, hscodeId: string): Promi
 export async function updateFavoriteNote(userId: string, hscodeId: string, note: string) {
   await db
     .update(userFavorites)
-    .set({ note })
+    .set({ note, updatedAt: new Date() })
     .where(and(eq(userFavorites.userId, userId), eq(userFavorites.hscodeId, hscodeId)));
   return { success: true };
 }

@@ -16,7 +16,11 @@ export const userFavorites = pgTable(
       .references(() => hscodes.id, { onDelete: 'cascade' }),
     note: text('note'), // 自定义备注，例如“客户A常用模组”、“自用物料”
     tags: text('tags'), // 自定义标签，逗号隔开
-    createdAt: timestamp('createdAt', { mode: 'date' }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { mode: 'date', withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'date', withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (table) => ({
     userHscodeIdx: uniqueIndex('user_favorite_user_hscode_idx').on(table.userId, table.hscodeId),
