@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Copy, Check, Printer, Calculator } from 'lucide-react';
+import { Copy, Check, Printer, Calculator, FileSpreadsheet } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import FavoriteButton from "@/components/hscode/FavoriteButton";
+import PrintArchiveModal, { HsCodeDetailForPrint } from '@/components/hscode/PrintArchiveModal';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -31,10 +32,12 @@ interface DetailHeaderProps {
         vat: string | null;
         consumption: string | null;
     };
+    detailData?: HsCodeDetailForPrint;
 }
 
-export default function DetailHeader({ hscodeId, hscode, name, nameEn, rates }: DetailHeaderProps) {
+export default function DetailHeader({ hscodeId, hscode, name, nameEn, rates, detailData }: DetailHeaderProps) {
     const [copied, setCopied] = useState(false);
+    const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(hscode);
@@ -42,8 +45,8 @@ export default function DetailHeader({ hscodeId, hscode, name, nameEn, rates }: 
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handlePrint = () => {
-        window.print();
+    const handleOpenPrintModal = () => {
+        setIsPrintModalOpen(true);
     };
 
     const dutyVal = rates?.mfn ? parseFloat(rates.mfn) : 0;
@@ -51,8 +54,20 @@ export default function DetailHeader({ hscodeId, hscode, name, nameEn, rates }: 
     const consVal = rates?.consumption ? parseFloat(rates.consumption) : 0;
     const calculatorUrl = `/tools/tax?duty=${dutyVal}&vat=${vatVal}&consumption=${consVal}`;
 
+    // 整合用于打印与归档的数据
+    const printPayload: HsCodeDetailForPrint = {
+        id: hscodeId,
+        code: hscode,
+        name: name,
+        mfnRate: rates?.mfn ?? null,
+        vatRate: rates?.vat ?? null,
+        consumptionRate: rates?.consumption ?? null,
+        ...(detailData || {}),
+    };
+
     return (
-        <div className="bg-white/95 dark:bg-[#080c14]/95 backdrop-blur-md border-b border-slate-200/90 dark:border-white/[0.08] sticky top-16 z-20 print:static print:bg-white print:border-b-2 print:border-black shadow-2xs transition-colors duration-200">
+        <>
+        <div className="bg-white/95 dark:bg-[#080c14]/95 backdrop-blur-md border-b border-slate-200/90 dark:border-white/[0.08] sticky top-16 z-20 print:hidden shadow-2xs transition-colors duration-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
                 <div className="flex flex-col gap-4">
                     {/* 面包屑 */}
@@ -138,11 +153,12 @@ export default function DetailHeader({ hscodeId, hscode, name, nameEn, rates }: 
                             <Button 
                                 variant="outline" 
                                 size="sm" 
-                                onClick={handlePrint}
+                                onClick={handleOpenPrintModal}
                                 className="h-9 px-3 border-slate-200 dark:border-white/[0.1] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl cursor-pointer"
+                                title="打印海关编码与关税详情"
                             >
                                 <Printer className="w-4 h-4 mr-1.5 text-slate-500 dark:text-slate-400" />
-                                打印 / 归档
+                                打印
                             </Button>
 
                             <Button 
@@ -160,5 +176,13 @@ export default function DetailHeader({ hscodeId, hscode, name, nameEn, rates }: 
                 </div>
             </div>
         </div>
+
+        {/* 海关规范归档单打印与预览弹窗 */}
+        <PrintArchiveModal 
+            isOpen={isPrintModalOpen} 
+            onClose={() => setIsPrintModalOpen(false)} 
+            data={printPayload} 
+        />
+        </>
     );
 }
