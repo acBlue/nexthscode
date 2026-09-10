@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { hscodes, chapters } from '@/db/schema';
 // 1. ✅ 核心修复：添加 sql 导入
-import { like, or, and, ilike, eq, inArray, count, desc, asc, SQL, sql } from 'drizzle-orm';
+import { or, and, ilike, eq, inArray, count, asc, SQL, sql } from 'drizzle-orm';
 import { unstable_cache } from 'next/cache';
 
 export interface SearchParams {
@@ -18,8 +18,8 @@ export async function searchHsCodes({ q, page = 1, pageSize = 10, chapters: sele
     const cleanQuery = q?.trim() || "";
     const offset = (page - 1) * pageSize;
 
-    // 构造搜索条件
-    const searchConditions: (SQL | undefined)[] = [];
+    // 构造搜索条件 (默认只查询启用状态)
+    const searchConditions: (SQL | undefined)[] = [eq(hscodes.status, 1)];
 
     // A. 关键词搜索
     if (cleanQuery) {
@@ -80,12 +80,15 @@ export const getChapterFacets = async (query: string) => {
     // 仅使用搜索关键词条件，不应用章节筛选，
     // 这样用户即使勾选了某一章，也能看到其他章有多少结果
     const searchCondition = cleanQuery
-        ? or(
-            ilike(hscodes.code, `%${cleanQuery}%`),
-            ilike(hscodes.cleanCode, `%${cleanQuery}%`),
-            ilike(hscodes.name, `%${cleanQuery}%`)
+        ? and(
+            eq(hscodes.status, 1),
+            or(
+                ilike(hscodes.code, `%${cleanQuery}%`),
+                ilike(hscodes.cleanCode, `%${cleanQuery}%`),
+                ilike(hscodes.name, `%${cleanQuery}%`)
+            )
         )
-        : undefined;
+        : eq(hscodes.status, 1);
 
     // 聚合查询: Group By Chapter + Count
     const facets = await db
@@ -136,10 +139,13 @@ export async function quickSearchHsCodes(query: string, limit = 8) {
 
     try {
         const results = await db.query.hscodes.findMany({
-            where: or(
-                ilike(hscodes.code, `%${clean}%`),
-                ilike(hscodes.cleanCode, `%${clean}%`),
-                ilike(hscodes.name, `%${clean}%`)
+            where: and(
+                eq(hscodes.status, 1),
+                or(
+                    ilike(hscodes.code, `%${clean}%`),
+                    ilike(hscodes.cleanCode, `%${clean}%`),
+                    ilike(hscodes.name, `%${clean}%`)
+                )
             ),
             columns: {
                 id: true,

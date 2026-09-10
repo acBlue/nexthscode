@@ -41,7 +41,15 @@ export const {
                     // 2. 比对密码
                     const passwordsMatch = await bcrypt.compare(password, user.password);
 
-                    if (passwordsMatch) return user;
+                    if (passwordsMatch) {
+                        // 异步更新最后登录时间
+                        db.update(users)
+                            .set({ lastLoginAt: new Date() })
+                            .where(eq(users.id, user.id))
+                            .catch((err) => console.error("Update lastLoginAt error:", err));
+
+                        return user;
+                    }
                 }
 
                 return null;

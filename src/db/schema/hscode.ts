@@ -1,11 +1,21 @@
-import { pgTable, text, uuid, timestamp, jsonb, index, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, timestamp, jsonb, index, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { users } from './account';
 
 // 1. 大类表 (Section)
 export const sections = pgTable('section', {
     id: uuid('id').defaultRandom().primaryKey(),
     code: text('code').notNull().unique(), // I, II, XVI
     name: text('name').notNull(),
+    desc: text('desc'),
+    sortOrder: integer('sort_order').default(0).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
+    createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+    updatedBy: uuid('updated_by').references(() => users.id, { onDelete: 'set null' }),
 });
 
 // 定义 Section 的关联关系
@@ -19,7 +29,15 @@ export const chapters = pgTable('chapter', {
     code: text('code').notNull().unique(), // 85
     name: text('name').notNull(),
     desc: text('desc'),
+    sortOrder: integer('sort_order').default(0).notNull(),
     sectionId: uuid('sectionId').notNull().references(() => sections.id),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
+    createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+    updatedBy: uuid('updated_by').references(() => users.id, { onDelete: 'set null' }),
 });
 
 // 定义 Chapter 的关联关系
@@ -32,7 +50,6 @@ export const chaptersRelations = relations(chapters, ({ one, many }) => ({
 }));
 
 // 3. 海关编码表 (HsCode)
-// 3. 海关编码表 (HsCode) - 包含你的新字段
 export const hscodes = pgTable('hscode', {
   id: uuid('id').defaultRandom().primaryKey(),
   
@@ -46,6 +63,9 @@ export const hscodes = pgTable('hscode', {
   name: text('name').notNull(),          // product_name
   description: text('description'),      // remarks
   
+  // --- 状态标识 (1: 有效启用, 0: 已废弃/失效) ---
+  status: integer('status').default(1).notNull(),
+
   // --- 计量单位 (拆分) ---
   unit1: text('unit1'),                  // unit_1
   unit2: text('unit2'),                  // unit_2
@@ -81,13 +101,19 @@ export const hscodes = pgTable('hscode', {
   // --- 关联 ---
   chapterId: uuid('chapterId').notNull().references(() => chapters.id),
   
-  // --- 时间戳 ---
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+  // --- 审计跟踪 ---
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+  updatedBy: uuid('updated_by').references(() => users.id, { onDelete: 'set null' }),
 }, (table) => {
   return {
-    cleanCodeIdx: index('hsode_cleanCode_idx').on(table.cleanCode),
+    cleanCodeIdx: index('hscode_clean_code_idx').on(table.cleanCode),
     nameIdx: index('hscode_name_idx').on(table.name),
+    statusIdx: index('hscode_status_idx').on(table.status),
   };
 });
 

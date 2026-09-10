@@ -23,10 +23,10 @@ export const getAllSectionsWithChapters = unstable_cache(
         const sectionsData = await db.query.sections.findMany({
             with: {
                 chapters: {
-                    orderBy: [asc(chapters.code)],
+                    orderBy: [asc(chapters.sortOrder), asc(chapters.code)],
                 },
             },
-            orderBy: [asc(sections.code)],
+            orderBy: [asc(sections.sortOrder), asc(sections.code)],
         });
 
         // 2. 聚合查询：计算每个章节下的 HSCode 数量
@@ -70,7 +70,7 @@ export const getHomeCategories = unstable_cache(
     async () => {
         try {
             const result = await db.query.sections.findMany({
-                orderBy: [asc(sections.code)],
+                orderBy: [asc(sections.sortOrder), asc(sections.code)],
             });
             if (result && result.length > 0) {
                 return result.map((r) => ({ id: r.id, code: r.code, name: r.name }));

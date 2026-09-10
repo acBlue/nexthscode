@@ -5,8 +5,6 @@ import {
     primaryKey,
     integer,
     uuid,
-    boolean,
-   // type AdapterAccount, // 需要从 @auth/core/adapters 导入，或者直接忽略类型检查
 } from "drizzle-orm/pg-core";
 import {AdapterAccount} from "@auth/core/adapters";
 
@@ -21,6 +19,13 @@ export const users = pgTable("user", {
     image: text("image"),
     password: text("password"), // 用于凭证登录 (邮箱+密码)
     role: text("role").default("user"), // 扩展字段：用户角色 (user/admin)
+    status: text("status").default("active").notNull(), // active, disabled
+    lastLoginAt: timestamp("last_login_at", { withTimezone: true, mode: "date" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
 });
 
 // 2. 账号表 (用于 OAuth，如 GitHub/Google 登录)
