@@ -36,7 +36,9 @@ export default async function DetailPage({ params }: DetailPageProps) {
 
   return (
     <div className="min-h-screen bg-slate-50/60 dark:bg-[#080c14] font-sans text-slate-900 dark:text-slate-100 pb-20 selection:bg-blue-600 selection:text-white transition-colors duration-200">
-      <Navbar />
+      <div className="print:hidden">
+        <Navbar />
+      </div>
 
       <HistoryTracker
         id={data.id}
@@ -55,9 +57,10 @@ export default async function DetailPage({ params }: DetailPageProps) {
           vat: data.vatRate,
           consumption: data.consumptionRate
         }}
+        detailData={data as any}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 print:hidden">
         
         {/* 顶部：3 大核心概览卡片 */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
@@ -207,7 +210,9 @@ export default async function DetailPage({ params }: DetailPageProps) {
 
       </main>
 
-      <Footer />
+      <div className="print:hidden">
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -134,33 +134,89 @@
 }
 
 @media print {
-  nav, footer, button, .no-print, [role="dialog"], [data-radix-scroll-area-viewport] {
-    overflow: visible !important;
+  /* 1. 彻底切断暗色模式系统色调，强制浅色公文渲染 */
+  :root,
+  html,
+  html.dark,
+  body,
+  body.dark,
+  .dark {
+    color-scheme: light !important;
+    --background: #ffffff !important;
+    --foreground: #0f172a !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
   }
+
+  /* 2. 强制还原背景颜色与高清线条 */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* 3. 隐藏所有屏幕端导航、页脚、悬浮按钮与交互控件 */
+  header,
+  nav,
+  footer,
+  aside,
+  button,
+  .print\:hidden,
+  .print-hidden,
+  [data-radix-scroll-area-scrollbar] {
+    display: none !important;
+  }
+
+  /* 4. A4 纸张规格，预留精准优雅边距 */
   @page {
-    margin: 15mm;
-    size: auto;
+    size: A4 portrait;
+    margin: 12mm 14mm;
   }
-  body {
-    background: white !important;
-    color: black !important;
-    font-size: 12pt;
-  }
-  .scroll-area, .overflow-auto, .overflow-y-auto {
-    overflow: visible !important;
+
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
     height: auto !important;
-    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
   }
-  .bg-slate-50, .bg-gray-50, .bg-blue-50, .bg-amber-50, .bg-background, .bg-muted {
-    background-color: transparent !important;
+
+  /* 5. 打印专用单据全幅 */
+  #print-only-sheet {
+    display: block !important;
+    width: 100% !important;
+    background: #ffffff !important;
   }
-  .border, .border-b, .border-l-4 {
-    border-color: #000 !important;
+
+  #print-only-sheet > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
   }
-  .text-blue-600, .text-blue-700, .text-amber-600, .text-emerald-600, .text-muted-foreground {
-    color: #000 !important;
+
+  /* 6. 表格和区块防截断 */
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
-  .break-inside-avoid {
-    break-inside: avoid;
+
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    word-break: break-word;
   }
 }
